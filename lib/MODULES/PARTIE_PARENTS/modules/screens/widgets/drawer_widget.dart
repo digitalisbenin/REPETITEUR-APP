@@ -1,9 +1,15 @@
+import 'dart:convert';
+
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:http/http.dart' as http;
+import 'package:badges/badges.dart' as badges;
 import 'package:provider/provider.dart';
 import 'package:repetiteur_mobile_app_definitive/MODULES/PARTIE_PARENTS/modules/screens/appreciation/appreciation_screen.dart';
+import 'package:repetiteur_mobile_app_definitive/MODULES/PARTIE_PARENTS/modules/screens/appreciation/pour_repetiteur/list_appreciation_pour_repetiteur.dart';
 import 'package:repetiteur_mobile_app_definitive/MODULES/PARTIE_PARENTS/modules/screens/authentication/login/login_screen.dart';
 import 'package:repetiteur_mobile_app_definitive/MODULES/PARTIE_PARENTS/modules/screens/authentication/register/register_screen.dart';
 import 'package:repetiteur_mobile_app_definitive/MODULES/PARTIE_PARENTS/modules/screens/bibliotheque/bibliotheque_screen.dart';
@@ -15,11 +21,98 @@ import 'package:repetiteur_mobile_app_definitive/core/utils/size_config.dart';
 import 'package:repetiteur_mobile_app_definitive/provider/database/db_provider.dart';
 import 'package:repetiteur_mobile_app_definitive/shared/ui/widgets/buttons/app_fill_button.dart';
 
-class DrawerWidget extends StatelessWidget {
+class DrawerWidget extends StatefulWidget {
   DrawerWidget({super.key});
+
+  @override
+  State<DrawerWidget> createState() => _DrawerWidgetState();
+}
+
+class _DrawerWidgetState extends State<DrawerWidget> {
   final nomUser = GetStorage().read('userName') ?? 'Nom d\'utilisateur';
+
   final token = GetStorage().read('token');
+
   final mailUser = GetStorage().read('userMail') ?? 'test@gmail.com';
+
+  int unreadRequests = 0;
+  int unreadMessages = 0;
+
+  List<String> unreadNotificationIds = [];
+
+  Future<void> fetchData() async {
+
+    final userId = GetStorage().read("userId");
+
+    final url =
+        "http://api-mon-encadreur.com/api/postes?user_id=$userId";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final List<dynamic> responseData = json.decode(response.body)['data'];
+
+      // Mise à jour du nombre de demandes non lues
+      setState(() {
+        unreadRequests = responseData.length;
+      });
+
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  Future<void> fetchNotificationsData() async {
+    final userId = GetStorage().read("userId");
+
+    final notificationsUrl =
+        'http://api-mon-encadreur.com/api/notifications?user_id=$userId';
+
+    final response = await http.get(Uri.parse(notificationsUrl));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final List<dynamic> responseData = jsonDecode(response.body)['data'];
+
+      // Compter les notifications non lues
+      unreadNotificationIds = responseData
+          .where((notification) => notification['status'] == 'Non lu')
+          .map((notification) => notification['id'].toString())
+          .toList();
+
+      setState(() {
+        unreadMessages = unreadNotificationIds.length;
+      });
+    } else {
+      throw Exception('Failed to load notifications');
+    }
+  }
+
+  Future<void> markNotificationsAsRead() async {
+    for (String notificationId in unreadNotificationIds) {
+      final notificationsUrl =
+          'http://api-mon-encadreur.com/api/notifications/$notificationId';
+
+      final response = await http.put(
+        Uri.parse(notificationsUrl),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'status': 'Lu', // Mettre à jour le statut de la notification à "Lu"
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Notification marquée comme lue avec succès
+        setState(() {
+          unreadMessages -= 1; // Réduire le nombre de notifications non lues
+        });
+      } else {
+        throw Exception('Failed to mark notification as read');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -33,15 +126,19 @@ class DrawerWidget extends StatelessWidget {
                 accountEmail: Text('$mailUser')),
           ),
           if (token != null && token.isNotEmpty)
-            GestureDetector(
-              child: const CustomListTileWidget(
-                text: 'Boîte de réception',
-                iconData: Icons.note_add_outlined,
-                iconColor: kPrimaryColor,
+            badges.Badge(
+              position: BadgePosition.topEnd(top: 3, end: 88),
+              badgeContent: Text(unreadRequests.toString(), style: TextStyle(color: Colors.white),),
+              child: GestureDetector(
+                child: const CustomListTileWidget(
+                  text: 'Boîte de réception',
+                  iconData: Icons.note_add_outlined,
+                  iconColor: kPrimaryColor,
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, AppreciationScreen.routeName);
+                },
               ),
-              onTap: () {
-                Navigator.pushNamed(context, AppreciationScreen.routeName);
-              },
             ),
           if (token != null && token.isNotEmpty)
             GestureDetector(
@@ -55,14 +152,29 @@ class DrawerWidget extends StatelessWidget {
               },
             ),
           if (token != null && token.isNotEmpty)
+            badges.Badge(
+              position: BadgePosition.topEnd(top: 3, end: 8),
+              badgeContent: Text(unreadMessages.toString(), style: TextStyle(color: Colors.white),),
+              child: GestureDetector(
+                child: const CustomListTileWidget(
+                  text: 'Réponse de l\'administrateur',
+                  iconData: LineIcons.editAlt,
+                  iconColor: kPrimaryColor,
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, AdminResponseScreen.routeName);
+                },
+              ),
+            ),
+          if (token != null && token.isNotEmpty)
             GestureDetector(
               child: const CustomListTileWidget(
-                text: 'Réponse de l\'administrateur',
-                iconData: LineIcons.editAlt,
+                text: 'Appréciations',
+                iconData: Icons.add_reaction_outlined,
                 iconColor: kPrimaryColor,
               ),
               onTap: () {
-                Navigator.pushNamed(context, AdminResponseScreen.routeName);
+               Navigator.pushNamed(context, AppreciationPourRepetiteur.routeName);
               },
             ),
           if (token != null && token.isNotEmpty)

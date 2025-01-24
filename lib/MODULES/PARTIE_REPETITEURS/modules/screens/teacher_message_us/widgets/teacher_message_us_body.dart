@@ -47,7 +47,9 @@ class _TeacherMessageUsBodyState extends State<TeacherMessageUsBody> {
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        title: const Text("Laisser nous un message"),
+        iconTheme: const IconThemeData(color: kWhite),
+        backgroundColor: kPrimaryColor,
+        title: const Text("Laissez-nous un message", style: TextStyle(color: kWhite),),
         centerTitle: true,
         elevation: 0.0,
       ),
@@ -129,7 +131,7 @@ class _TeacherMessageUsBodyState extends State<TeacherMessageUsBody> {
                 AppInputField(
                   title: "Objet",
                   hintText: "Remerciements",
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.text,
                   controller: _userObjectController,
                   maxLines: 1,
                 ),
@@ -138,7 +140,7 @@ class _TeacherMessageUsBodyState extends State<TeacherMessageUsBody> {
                 ),
                 AppInputField(
                   title: "Message (Champ Obligatoire)",
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.text,
                   controller: _userMessageController,
                   maxLines: 5,
                 ),

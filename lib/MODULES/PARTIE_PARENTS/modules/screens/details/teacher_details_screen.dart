@@ -15,8 +15,7 @@ import 'package:http/http.dart' as http;
 class TeacherDetailsScreen extends StatefulWidget {
   static String routeName = '/teacher_detail_screen';
 
-  final Teachers teachers; // Assurez-vous que la classe Teachers est correcte
-  final String repetiteurId;
+
 
   const TeacherDetailsScreen({
     Key? key,
@@ -24,11 +23,15 @@ class TeacherDetailsScreen extends StatefulWidget {
     required this.repetiteurId,
   }) : super(key: key);
 
+  final Teachers teachers; // Assurez-vous que la classe Teachers est correcte
+  final String repetiteurId;
+
   @override
   State<TeacherDetailsScreen> createState() => _TeacherDetailsScreenState();
 }
 
 class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
+
   String classe = '';
   String matiere = '';
 
@@ -42,7 +45,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://apirepetiteur.sevenservicesplus.com/api/repetiteurmcs?repetiteur_id=${widget.repetiteurId}'),
+            'http://api-mon-encadreur.com/api/repetiteurmcs?repetiteur_id=${widget.repetiteurId}'),
       );
 
       print(' ::::::::::::::::::::: ${widget.repetiteurId}');
@@ -70,7 +73,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
     try {
       final response = await http.post(
           Uri.parse(
-              'http://apirepetiteur.sevenservicesplus.com/api/evaluations'),
+              'https://api-mon-encadreur.com/api/evaluations'),
           body: {
             "repetiteur_id": widget.repetiteurId,
             "niveauEvaluation": rating.toString(),
@@ -80,10 +83,13 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
             'Authorization': 'Bearer $userToken'
           });
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.snackbar("Succès", "Évaluation envoyée avec succès", backgroundColor: kWhite, colorText: Colors.green);
+         print('status code : ${response.statusCode}');
+        Get.snackbar("Succès", "Évaluation envoyée avec succès",
+            backgroundColor: kWhite, colorText: Colors.green);
       } else {
+        print('body: ${response.body}');
         print('Erreur d\'envoi: ${response.statusCode}');
-        Get.snackbar('Erreur', 'Échec de l\'envoi de l\'évaluation');
+        Get.snackbar('Erreur', 'Vous avez déjà évaluer ce encadreur',backgroundColor: kWhite, colorText: Colors.red);
       }
     } catch (e) {
       print('Erreur: $e');
@@ -96,475 +102,373 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
     final TeacherDetailsArgument? arguments =
         ModalRoute.of(context)?.settings.arguments as TeacherDetailsArgument?;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(arguments!.teachers.user.name.toString()),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15.0),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(
-                arguments.teachers.profilImageUrl,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: const IconThemeData(color: kWhite),
+          backgroundColor: kPrimaryColor,
+          title: Text(arguments!.teachers.user.name.toString(), style: const TextStyle(color: kWhite),),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 15.0),
+              child: CircleAvatar(
+                backgroundImage: widget.teachers.profilImageUrl.toString() != 'null' ? NetworkImage(
+                  widget.teachers.profilImageUrl.toString(),
+                ) : const NetworkImage('https://apibackout.s3.amazonaws.com/images/1713947852vectoriel.jpg'),
+                radius: 20,
               ),
-              radius: 20,
-            ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Matricule",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.matricule,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Classe",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                classe,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Matière",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                matiere,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              verticalSpaceTiny,
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Status",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.status,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Description",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.description,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Adresse",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.adresse,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Disponibilité",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.heureDisponibilite,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.05,
-              ),
-              const Center(
-                child: Text(
-                  "Autres Informations",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            )
+          ],
+          bottom: const TabBar(
+              indicatorColor: kWhite,
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelColor: kPrimaryColor,
+              dividerColor: kWhite,
+              tabs: [
+                Tab(
+                  child: Text(
+                    "Profil",
+                    style: TextStyle(color: kWhite, fontSize: 18.0),
+                  ),
                 ),
-              ),
-              const Divider(),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.02,
-              ),
-              const Text(
-                "Situation Matrimoniale",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.situationMatrimoniale,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Ecole de provenance",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.ecole,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Cycle",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.cycle,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Grade",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.grade,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Niveau d'étude",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.niveauEtude,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Statut de l'enseignent",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.etats,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Evaluer par DIGITALIS SARL",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.evaluation,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.03,
-              ),
-              const Text(
-                "Experience Professionnelle",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              verticalSpaceTiny,
-              Text(
-                arguments.teachers.experience,
-                maxLines: 4,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.02,
-              ),
-              if ((GetStorage().read("token")) != null &&
-                  (GetStorage().read("token")).isNotEmpty)
-                Center(
-                  child: RatingBar(
-                    filledIcon: Icons.star,
-                    emptyIcon: Icons.star_border,
-                    onRatingChanged: (value) {
-                      sendEvaluations(value);
-                      debugPrint('$value');
-                    },
-                    initialRating: 0,
-                    alignment: Alignment.center,
+                Tab(
+                  child: Text(
+                    "Autres Informations",
+                    style: TextStyle(color: kWhite, fontSize: 18.0),
                   ),
                 )
-            ],
-          ),
+              ]),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          onPressed: (GetStorage().read("token") != null &&
-                  GetStorage().read("token").isNotEmpty)
-              ? () {
-                  GetStorage()
-                      .write("teacher_matricule", arguments.teachers.matricule);
-                  GetStorage().write("teacher_classe", classe);
-                  GetStorage().write("teacher_matiere", matiere);
-                  GetStorage().write("teacher_id", widget.repetiteurId);
-                  Navigator.pushNamed(context, TeacherQuickAskScreen.routeName);
-                }
-              : null, // Désactive le bouton si la condition n'est pas remplie
-          child: const Text(
-            "Demander ce répétiteur",
-            style: TextStyle(color: kWhite),
+        body: TabBarView(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Matricule",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  verticalSpaceTiny,
+                  Text(
+                    arguments.teachers.matricule.toString(),
+                    maxLines: 4,
+                    style: const TextStyle(
+                        fontSize: 15.0, fontWeight: FontWeight.normal),
+                    textAlign: TextAlign.justify,
+                  ),
+                  SizedBox(
+                    height: SizeConfig.screenHeight * 0.03,
+                  ),
+                  const Text(
+                    "Classe",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  verticalSpaceTiny,
+                  Text(
+                    classe,
+                    maxLines: 4,
+                    style: const TextStyle(
+                        fontSize: 15.0, fontWeight: FontWeight.normal),
+                    textAlign: TextAlign.justify,
+                  ),
+                  SizedBox(
+                    height: SizeConfig.screenHeight * 0.03,
+                  ),
+                  const Text(
+                    "Matière",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  verticalSpaceTiny,
+                  Text(
+                    matiere,
+                    maxLines: 4,
+                    style: const TextStyle(
+                        fontSize: 15.0, fontWeight: FontWeight.normal),
+                    textAlign: TextAlign.justify,
+                  ),
+                  verticalSpaceTiny,
+                  verticalSpaceTiny,
+                  const Text(
+                    "Cycle d'enseignement",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  verticalSpaceTiny,
+                  Text(
+                    arguments.teachers.cycle.toString(),
+                    maxLines: 4,
+                    style: const TextStyle(
+                        fontSize: 15.0, fontWeight: FontWeight.normal),
+                    textAlign: TextAlign.justify,
+                  ),
+                  SizedBox(
+                    height: SizeConfig.screenHeight * 0.03,
+                  ),
+                  const Text(
+                    "Statut de l'enseignent",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  verticalSpaceTiny,
+                  Text(
+                    arguments.teachers.etats.toString(),
+                    maxLines: 4,
+                    style: const TextStyle(
+                        fontSize: 15.0, fontWeight: FontWeight.normal),
+                    textAlign: TextAlign.justify,
+                  ),
+                  SizedBox(
+                    height: SizeConfig.screenHeight * 0.03,
+                  ),
+                  const Text(
+                    "Emploie du temps",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  verticalSpaceTiny,
+                  Text(
+                    arguments.teachers.heureDisponibilite.toString(),
+                    maxLines: 4,
+                    style: const TextStyle(
+                        fontSize: 15.0, fontWeight: FontWeight.normal),
+                    textAlign: TextAlign.justify,
+                  ),
+                  SizedBox(
+                    height: SizeConfig.screenHeight * 0.03,
+                  ),
+                  const Text(
+                    "Niveau d'étude",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  verticalSpaceTiny,
+                  Text(
+                    arguments.teachers.niveauEtude.toString(),
+                    maxLines: 4,
+                    style: const TextStyle(
+                        fontSize: 15.0, fontWeight: FontWeight.normal),
+                    textAlign: TextAlign.justify,
+                  ),
+                  SizedBox(
+                    height: SizeConfig.screenHeight * 0.05,
+                  ),
+                  if ((GetStorage().read("token")) != null &&
+                      (GetStorage().read("token")).isNotEmpty)
+                    Center(
+                      child: RatingBar(
+                        filledIcon: Icons.star,
+                        emptyIcon: Icons.star_border,
+                        onRatingChanged: (value) {
+                          sendEvaluations(value);
+                          debugPrint('$value');
+                        },
+                        initialRating: 0,
+                        alignment: Alignment.center,
+                      ),
+                    )
+                ],
+              ),
+            ),
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // const Text(
+                    //   "Status",
+                    //   style:
+                    //       TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    // ),
+                    // verticalSpaceTiny,
+                    // Text(
+                    //   arguments.teachers.status.toString(),
+                    //   maxLines: 4,
+                    //   style: const TextStyle(
+                    //       fontSize: 15.0, fontWeight: FontWeight.normal),
+                    //   textAlign: TextAlign.justify,
+                    // ),
+                    // SizedBox(
+                    //   height: SizeConfig.screenHeight * 0.03,
+                    // ),
+                    const Text(
+                      "Description",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    verticalSpaceTiny,
+                    Text(
+                      arguments.teachers.description.toString(),
+                      maxLines: 4,
+                      style: const TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.justify,
+                    ),
+                    SizedBox(
+                      height: SizeConfig.screenHeight * 0.03,
+                    ),
+                    const Text(
+                      "Adresse",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    verticalSpaceTiny,
+                    Text(
+                      arguments.teachers.adresse.toString(),
+                      maxLines: 4,
+                      style: const TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.justify,
+                    ),
+                    SizedBox(
+                      height: SizeConfig.screenHeight * 0.03,
+                    ),
+                    // const Text(
+                    //   "Ecole de provenance",
+                    //   style:
+                    //       TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    // ),
+                    // verticalSpaceTiny,
+                    // Text(
+                    //   arguments.teachers.ecole.toString(),
+                    //   maxLines: 4,
+                    //   style: const TextStyle(
+                    //       fontSize: 15.0, fontWeight: FontWeight.normal),
+                    //   textAlign: TextAlign.justify,
+                    // ),
+                    // SizedBox(
+                    //   height: SizeConfig.screenHeight * 0.03,
+                    // ),
+                    const Text(
+                      "Statut",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    verticalSpaceTiny,
+                    Text(
+                      arguments.teachers.grade.toString(),
+                      maxLines: 4,
+                      style: const TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.justify,
+                    ),
+                    SizedBox(
+                      height: SizeConfig.screenHeight * 0.03,
+                    ),
+                    const Text(
+                      "Evaluer par DIGITALIS SARL",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    verticalSpaceTiny,
+                    Text(
+                      arguments.teachers.evaluation.toString(),
+                      maxLines: 4,
+                      style: const TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.justify,
+                    ),
+                    SizedBox(
+                      height: SizeConfig.screenHeight * 0.03,
+                    ),
+                    const Text(
+                      "Experience Professionnelle",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    verticalSpaceTiny,
+                    Text(
+                      arguments.teachers.experience.toString(),
+                      maxLines: 4,
+                      style: const TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.justify,
+                    ),
+                    SizedBox(
+                      height: SizeConfig.screenHeight * 0.02,
+                    ),
+                    const Text(
+                      "Situation Matrimoniale",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    verticalSpaceTiny,
+                    Text(
+                      arguments.teachers.situationMatrimoniale.toString(),
+                      maxLines: 4,
+                      style: const TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.justify,
+                    ),
+                    SizedBox(
+                      height: SizeConfig.screenHeight * 0.02,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+
+        /*SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+
+
+                const Center(
+                  child: Text(
+                    "Autres Informations",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+
+
+                if ((GetStorage().read("token")) != null &&
+                    (GetStorage().read("token")).isNotEmpty)
+                  Center(
+                    child: RatingBar(
+                      filledIcon: Icons.star,
+                      emptyIcon: Icons.star_border,
+                      onRatingChanged: (value) {
+                        sendEvaluations(value);
+                        debugPrint('$value');
+                      },
+                      initialRating: 0,
+                      alignment: Alignment.center,
+                    ),
+                  )
+              ],
+            ),
+          ),
+        ),*/
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+            onPressed: (GetStorage().read("token") != null &&
+                    GetStorage().read("token").isNotEmpty)
+                ? () {
+                    GetStorage().write(
+                        "teacher_matricule", arguments.teachers.matricule);
+                    GetStorage().write("teacher_classe", classe);
+                    GetStorage().write("teacher_matiere", matiere);
+                    GetStorage().write("teacher_id", widget.repetiteurId);
+                    Navigator.pushNamed(
+                        context, TeacherQuickAskScreen.routeName);
+                  }
+                : null, // Désactive le bouton si la condition n'est pas remplie
+            child: const Text(
+              "Demander ce encadreur",
+              style: TextStyle(color: kWhite),
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-/* class MoreDetailsPage extends StatefulWidget {
-  const MoreDetailsPage({super.key});
-
-  static String routeName = '/more_details_page';
-
-  @override
-  State<MoreDetailsPage> createState() => _MoreDetailsPageState();
-}
-
-class _MoreDetailsPageState extends State<MoreDetailsPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Plus de details"),
-          centerTitle: true,
-          elevation: 0,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Expanded(
-            child: ListView(
-              children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      Container(
-                        height: SizeConfig.screenHeight * 0.15,
-                        decoration: BoxDecoration(
-                            color: kWhite,
-                            border: Border.all(color: Colors.grey.shade400),
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 3))
-                            ]),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: SizeConfig.screenWidth * 0.03),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    "N°",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.028,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "1",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.023),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: SizeConfig.screenWidth * 0.08,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    "Date",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.028,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "12-12-2023",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.023),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: SizeConfig.screenWidth * 0.08,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    "Objet",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.028,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "Appreciation",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.023),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: SizeConfig.screenWidth * 0.08,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    "Message(Observation)",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.028,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "Bon",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.023),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: SizeConfig.screenWidth * 0.08,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    "Réponse de l'Admin",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.028,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "Bien",
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.screenHeight * 0.023),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ));
-  }
-} */

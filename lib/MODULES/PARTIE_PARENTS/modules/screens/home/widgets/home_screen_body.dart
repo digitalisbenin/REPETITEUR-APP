@@ -66,8 +66,11 @@ class _ParentHomeScreenBodyState extends State<ParentHomeScreenBody> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white30,
       appBar: AppBar(
-        title: const Text("Accueil"),
+        iconTheme: const IconThemeData(color: kWhite),
+        title: const Text("Accueil", style: TextStyle(color: kWhite),),
+        backgroundColor: kPrimaryColor,
         centerTitle: true,
         elevation: 0,
         actions: [
@@ -76,9 +79,9 @@ class _ParentHomeScreenBodyState extends State<ParentHomeScreenBody> {
             PopupMenuButton<String>(
               iconSize: 25,
               onSelected: (String choice) {
-                if (choice == 'Ajouter un enfant') {
+                /*if (choice == 'Ajouter un enfant') {
                   Navigator.pushNamed(context, AddChildScreen.routeName);
-                }
+                }*/
                 if (choice == 'Faire une demande') {
                   Navigator.pushNamed(context, AddTeacherScreen.routeName);
                 }
@@ -99,7 +102,7 @@ class _ParentHomeScreenBodyState extends State<ParentHomeScreenBody> {
               },
               itemBuilder: (BuildContext context) {
                 return [
-                  'Ajouter un enfant',
+                  /*'Ajouter un enfant',*/
                   'Faire une demande',
                   'Liste de mes demandes',
                   'Mes paiements',
@@ -120,8 +123,21 @@ class _ParentHomeScreenBodyState extends State<ParentHomeScreenBody> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: getProportionateScreenHeight(14),
+                height: getProportionateScreenHeight(12),
               ),
+              const Padding(
+                padding: EdgeInsets.only(top: 15, left: 15),
+                child: Text("Quelques Encadreurs",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+              ),
+              TeacherScreen(
+                searchTeacherQuery: searchTeacherQuery,
+                press: () {},
+              ),
+              /*SizedBox(
+                height: SizeConfig.screenHeight * 0.01,
+              ),*/
               const Padding(
                 padding: EdgeInsets.only(top: 15, left: 10),
                 child: Text(
@@ -134,19 +150,6 @@ class _ParentHomeScreenBodyState extends State<ParentHomeScreenBody> {
               ),
               PatnerSchoolScreen(
                 searchQuery: searchSchoolQuery,
-                press: () {},
-              ),
-              SizedBox(
-                height: SizeConfig.screenHeight * 0.05,
-              ),
-              const Padding(
-                padding: EdgeInsets.only(top: 15, left: 15),
-                child: Text("Quelques Répétiteurs",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-              ),
-              TeacherScreen(
-                searchTeacherQuery: searchTeacherQuery,
                 press: () {},
               ),
             ],

@@ -1,3 +1,6 @@
 class AppUrl {
-    static String baseUrl = 'apirepetiteur.sevenservicesplus.com';
+    static String baseUrl = 'api-mon-encadreur.com';
 }
+
+// https://apirepetiteur.wadounnou.com/
+//https://www.api-mon-encadreur.com/api/matieres

@@ -9,7 +9,7 @@ import 'package:repetiteur_mobile_app_definitive/MODULES/PARTIE_REPETITEURS/modu
 import 'package:repetiteur_mobile_app_definitive/MODULES/PARTIE_REPETITEURS/modules/screens/widgets/drawer_widget.dart';
 import 'package:repetiteur_mobile_app_definitive/core/MODEL/PARENTS/models/classes/classes_model.dart';
 import 'package:repetiteur_mobile_app_definitive/core/MODEL/PARENTS/models/matieres/matieres_model.dart';
-import 'package:repetiteur_mobile_app_definitive/core/constants/PARENTS/constants.dart';
+import 'package:repetiteur_mobile_app_definitive/core/constants/REPETITEURS/constants.dart';
 import 'package:repetiteur_mobile_app_definitive/core/utils/size_config.dart';
 import 'package:repetiteur_mobile_app_definitive/core/utils/widgets/snack_message.dart';
 import 'package:repetiteur_mobile_app_definitive/inputs/base_input_field.dart';
@@ -41,14 +41,12 @@ class _TeacherHomeScreenBodyState extends State<TeacherHomeScreenBody> {
     fetchAllMatieres();
   }
 
-  // http://apirepetiteur.sevenservicesplus.com/api/classes
-
   Future<List<Classes>> fetchAllClasses() async {
     try {
       final teacherUserId = GetStorage().read("teacherUserId");
 
       const allClassesUrl =
-          'http://apirepetiteur.sevenservicesplus.com/api/classes';
+          'http://api-mon-encadreur.com/api/classes';
 
       final response = await http.get(Uri.parse(allClassesUrl));
 
@@ -71,7 +69,7 @@ class _TeacherHomeScreenBodyState extends State<TeacherHomeScreenBody> {
   Future<List<Matieres>> fetchAllMatieres() async {
     try {
       const allMatieresUrl =
-          'http://apirepetiteur.sevenservicesplus.com/api/matieres';
+          'http://api-mon-encadreur.com/api/matieres';
       final response = await http.get(Uri.parse(allMatieresUrl));
 
       final body = jsonDecode(response.body);
@@ -94,7 +92,9 @@ class _TeacherHomeScreenBodyState extends State<TeacherHomeScreenBody> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profil"),
+        iconTheme: const IconThemeData(color: kWhite),
+        backgroundColor: kPrimaryColor,
+        title: const Text("Profil", style: TextStyle(color: kWhite),),
         centerTitle: true,
         elevation: 0,
         actions: [

@@ -55,8 +55,10 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white30,
       appBar: AppBar(
-        title: Text("Nos Répétiteurs"),
+        backgroundColor: kPrimaryColor,
+        title: const Text("Nos Encadeurs", style: TextStyle(color: kWhite),),
         centerTitle: true,
         elevation: 0,
         automaticallyImplyLeading: false,

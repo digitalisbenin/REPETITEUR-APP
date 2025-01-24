@@ -46,7 +46,9 @@ class _MessageUsBodyState extends State<MessageUsBody> {
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
-        title: const Text("Laissez-nous un message"),
+        backgroundColor: kPrimaryColor,
+        iconTheme: const IconThemeData(color: kWhite),
+        title: const Text("Laissez-nous un message", style: TextStyle(color: kWhite),),
         centerTitle: true,
         elevation: 0.0,
       ),

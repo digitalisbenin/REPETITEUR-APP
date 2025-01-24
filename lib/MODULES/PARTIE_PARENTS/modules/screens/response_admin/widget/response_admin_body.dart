@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:repetiteur_mobile_app_definitive/core/constants/PARENTS/constants.dart';
 
 class AdminResponseBody extends StatefulWidget {
   const AdminResponseBody({super.key});
@@ -25,7 +26,7 @@ class _AdminResponseBodyState extends State<AdminResponseBody> {
     final userId = GetStorage().read("userId");
 
     final messagesUrl =
-        'http://apirepetiteur.sevenservicesplus.com/api/messages?teacherUserId=$userId';
+        'http://api-mon-encadreur.com/api/messages?user_id=$userId';
 
     final response = await http.get(Uri.parse(messagesUrl));
 
@@ -54,7 +55,9 @@ class _AdminResponseBodyState extends State<AdminResponseBody> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Réponse de l'administrateur"),
+        iconTheme: const IconThemeData(color: kWhite),
+        backgroundColor: kPrimaryColor,
+        title: const Text("Réponse de l'administrateur", style: TextStyle(color: kWhite),),
         centerTitle: true,
         elevation: 0,
       ),
@@ -103,8 +106,8 @@ class _AdminResponseBodyState extends State<AdminResponseBody> {
                     return DataRow(cells: [
                     //  DataCell(Text('$index')),
                       DataCell(Text(formatDate(messageDate))),
-                      DataCell(Text(userMessage, maxLines: 5,)),
-                      DataCell(Text(adminResponse, maxLines: 5,)),
+                      DataCell(Text(userMessage, maxLines: 10,)),
+                      DataCell(Text(adminResponse, maxLines: 10,)),
                     ]);
                   }).toList()),
             )

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:repetiteur_mobile_app_definitive/MODULES/PARTIE_PARENTS/modules/screens/popUpMenuScreens/addChild/widgets/add_child_form.dart';
+import 'package:repetiteur_mobile_app_definitive/core/constants/PARENTS/constants.dart';
 
 class AddChildScreen extends StatelessWidget {
   const AddChildScreen({super.key});
@@ -10,7 +11,9 @@ class AddChildScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ajouter un enfant"),
+        iconTheme: const IconThemeData(color: kWhite),
+        backgroundColor: kPrimaryColor,
+        title: Text("Ajouter un enfant", style: TextStyle(color: kWhite),),
         centerTitle: true,
         elevation: 0,
       ),

@@ -24,7 +24,7 @@ class _BibliothequeBodyState extends State<BibliothequeBody> {
 
   Future<void> fetchEpreuvesData() async {
     const epreuvesUrl =
-        'http://apirepetiteur.sevenservicesplus.com/api/epreuves';
+        'http://api-mon-encadreur.com/api/epreuves';
 
     final response = await http.get(Uri.parse(epreuvesUrl));
 
@@ -43,7 +43,9 @@ class _BibliothequeBodyState extends State<BibliothequeBody> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Bibliothèque"),
+        backgroundColor: kPrimaryColor,
+        iconTheme: const IconThemeData(color: kWhite),
+        title: const Text("Bibliothèque",style: TextStyle(color: kWhite),),
         centerTitle: true,
         elevation: 0,
       ),
@@ -96,7 +98,7 @@ class _BibliothequeBodyState extends State<BibliothequeBody> {
                     final String classe = epreuve['classe']['name'];
                     final String matiere = epreuve['matiere']['name'];
                     final String epreuveUrl = epreuve['epreuve'];
-                    final String corrigeUrl = epreuve['corrige'];
+                    final String corrigeUrl = epreuve['corrige'] ?? 'N/A';
 
                     return DataRow(cells: [
                       DataCell(Text('$index')),

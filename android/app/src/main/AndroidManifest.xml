@@ -1,9 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" 
+package="com.monencadreurs.application">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="Mon Répétiteur"
+        android:label="Mon Encadreur"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
