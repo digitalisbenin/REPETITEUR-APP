@@ -38,7 +38,7 @@ class _PaymentListScreenBodyState extends State<PaymentListScreenBody> {
   Future<void> fetchData() async {
     final userId = GetStorage().read("userId");
     final url =
-        "http://apirepetiteur.wadounnou.com/api/payements?user_id=$userId";
+        "http://api-mon-encadreur.com/api/payements?user_id=$userId";
 
     final response = await http.get(Uri.parse(url));
 
@@ -126,8 +126,8 @@ class _PaymentListScreenBodyState extends State<PaymentListScreenBody> {
         email: GetStorage().read("parentEmail").toString(),
         reason: 'transaction reason',
         data: 'Fake data',
-        sandbox: true,
-        apikey: 'd81f7db084ba11eea99e794f985e5009',
+        sandbox: false,
+        apikey: '943b0af31e7672babe8b44e740cccf63dd66532b',
         callback: successCallback,
         theme: defaultTheme,
         paymentMethods: ["momo", "card"]);

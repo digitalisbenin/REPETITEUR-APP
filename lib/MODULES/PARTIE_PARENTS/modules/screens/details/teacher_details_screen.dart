@@ -45,7 +45,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://apirepetiteur.wadounnou.com/api/repetiteurmcs?repetiteur_id=${widget.repetiteurId}'),
+            'http://api-mon-encadreur.com/api/repetiteurmcs?repetiteur_id=${widget.repetiteurId}'),
       );
 
       print(' ::::::::::::::::::::: ${widget.repetiteurId}');
@@ -73,7 +73,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
     try {
       final response = await http.post(
           Uri.parse(
-              'https://apirepetiteur.wadounnou.com/api/evaluations'),
+              'https://api-mon-encadreur.com/api/evaluations'),
           body: {
             "repetiteur_id": widget.repetiteurId,
             "niveauEvaluation": rating.toString(),
@@ -83,11 +83,13 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
             'Authorization': 'Bearer $userToken'
           });
       if (response.statusCode == 200 || response.statusCode == 201) {
+         print('status code : ${response.statusCode}');
         Get.snackbar("Succès", "Évaluation envoyée avec succès",
             backgroundColor: kWhite, colorText: Colors.green);
       } else {
+        print('body: ${response.body}');
         print('Erreur d\'envoi: ${response.statusCode}');
-        Get.snackbar('Erreur', 'Échec de l\'envoi de l\'évaluation');
+        Get.snackbar('Erreur', 'Vous avez déjà évaluer ce encadreur',backgroundColor: kWhite, colorText: Colors.red);
       }
     } catch (e) {
       print('Erreur: $e');
@@ -273,22 +275,22 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Status",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    verticalSpaceTiny,
-                    Text(
-                      arguments.teachers.status.toString(),
-                      maxLines: 4,
-                      style: const TextStyle(
-                          fontSize: 15.0, fontWeight: FontWeight.normal),
-                      textAlign: TextAlign.justify,
-                    ),
-                    SizedBox(
-                      height: SizeConfig.screenHeight * 0.03,
-                    ),
+                    // const Text(
+                    //   "Status",
+                    //   style:
+                    //       TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    // ),
+                    // verticalSpaceTiny,
+                    // Text(
+                    //   arguments.teachers.status.toString(),
+                    //   maxLines: 4,
+                    //   style: const TextStyle(
+                    //       fontSize: 15.0, fontWeight: FontWeight.normal),
+                    //   textAlign: TextAlign.justify,
+                    // ),
+                    // SizedBox(
+                    //   height: SizeConfig.screenHeight * 0.03,
+                    // ),
                     const Text(
                       "Description",
                       style:
@@ -306,7 +308,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                       height: SizeConfig.screenHeight * 0.03,
                     ),
                     const Text(
-                      "Détail sur l'adresse",
+                      "Adresse",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -321,24 +323,24 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                     SizedBox(
                       height: SizeConfig.screenHeight * 0.03,
                     ),
+                    // const Text(
+                    //   "Ecole de provenance",
+                    //   style:
+                    //       TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    // ),
+                    // verticalSpaceTiny,
+                    // Text(
+                    //   arguments.teachers.ecole.toString(),
+                    //   maxLines: 4,
+                    //   style: const TextStyle(
+                    //       fontSize: 15.0, fontWeight: FontWeight.normal),
+                    //   textAlign: TextAlign.justify,
+                    // ),
+                    // SizedBox(
+                    //   height: SizeConfig.screenHeight * 0.03,
+                    // ),
                     const Text(
-                      "Ecole de provenance",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    verticalSpaceTiny,
-                    Text(
-                      arguments.teachers.ecole.toString(),
-                      maxLines: 4,
-                      style: const TextStyle(
-                          fontSize: 15.0, fontWeight: FontWeight.normal),
-                      textAlign: TextAlign.justify,
-                    ),
-                    SizedBox(
-                      height: SizeConfig.screenHeight * 0.03,
-                    ),
-                    const Text(
-                      "Grade",
+                      "Statut",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -461,7 +463,7 @@ class _TeacherDetailsScreenState extends State<TeacherDetailsScreen> {
                   }
                 : null, // Désactive le bouton si la condition n'est pas remplie
             child: const Text(
-              "Demander ce répétiteur",
+              "Demander ce encadreur",
               style: TextStyle(color: kWhite),
             ),
           ),

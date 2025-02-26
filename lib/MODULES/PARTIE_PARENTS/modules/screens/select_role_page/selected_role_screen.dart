@@ -82,6 +82,7 @@ class _SelectedRoleScreenState extends State<SelectedRoleScreen> {
           appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.transparent,
+            automaticallyImplyLeading: false,
             actions: const [
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
@@ -139,7 +140,7 @@ class _SelectedRoleScreenState extends State<SelectedRoleScreen> {
                             ),
                           ),
                           const Text(
-                            'Module du Répétiteur',
+                            'Module de l\' Encadreur',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w700),
                           ),
@@ -211,7 +212,7 @@ class _SelectedRoleScreenState extends State<SelectedRoleScreen> {
                           ),
                           child: Text(
                             selectedRole == 'Repetiteur'
-                                ? 'Continuer en tant que Répétiteur'
+                                ? 'Continuer en tant que Encadreurs'
                                 : 'Continuer en tant que Parents',
                             style: const TextStyle(
                               color: Colors.white,
