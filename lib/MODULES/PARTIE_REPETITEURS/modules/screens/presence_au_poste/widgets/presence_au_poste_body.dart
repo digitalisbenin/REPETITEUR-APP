@@ -82,221 +82,266 @@ class _PresenceAuPosteBodyState extends State<PresenceAuPosteBody> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: [
-      SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          headingRowHeight:
-              SizeConfig.screenHeight * 0.06, // Hauteur de la ligne d'en-tête
-          dataRowMaxHeight: SizeConfig.screenHeight * 0.06,
-          columns: const [
-            DataColumn(label: Text('No.')),
-            DataColumn(label: Text('Nom et Prénom(s)')),
-            DataColumn(label: Text('Date')),
-            DataColumn(label: Text('Présence')),
-            DataColumn(label: Text('Action')),
-          ],
+    return presences.isEmpty
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.info,
+                    size: 50, color: Colors.grey[500]), // Icône informative
+                SizedBox(height: 10),
+                Text(
+                  'Aucune donnée disponible',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          )
+        : SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              headingRowHeight: SizeConfig.screenHeight *
+                  0.06, // Hauteur de la ligne d'en-tête
+              dataRowMaxHeight: SizeConfig.screenHeight * 0.06,
+              columns: const [
+                DataColumn(label: Text('No.')),
+                DataColumn(label: Text('Nom et Prénom(s)')),
+                DataColumn(label: Text('Date')),
+                DataColumn(label: Text('Présence')),
+                DataColumn(label: Text('Action')),
+              ],
 
-          rows: presences.asMap().entries.map((entry) {
-            final int index = entry.key + 1;
-            final Map<String, dynamic> presence = entry.value;
+              rows: presences.asMap().entries.map((entry) {
+                final int index = entry.key + 1;
+                final Map<String, dynamic> presence = entry.value;
 
-            final String id_presence = presence['id'];
-            final String nomRepetiteur = presence['repetiteur']['user']['name'];
-            final String date = formatDate(presence['created_at']);
+                final String id_presence = presence['id'];
+                final String nomRepetiteur =
+                    presence['repetiteur']['user']['name'];
+                final String date = formatDate(presence['created_at']);
 
-            GetStorage().write('presenceAuPosteId', id_presence);
+                GetStorage().write('presenceAuPosteId', id_presence);
 
-            return DataRow(cells: [
-              DataCell(Text('$index')),
-              DataCell(Text(nomRepetiteur)),
-              DataCell(Text(date)),
-              DataCell(presence['poste'] == null ? Container(
-                width: double.infinity,
-                  decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(18),
-              ), child: const Text("Non", style: TextStyle(color: kWhite), textAlign: TextAlign.center,)) : Container(width: double.infinity,decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(18),
-              ), child: const Text("Oui", style: TextStyle(color: kWhite),textAlign: TextAlign.center,))),
-              DataCell(
-                presence['poste'] == null
-                    ? TextButton(
-                        onPressed: () async {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return Dialog(
-                                    insetPadding: const EdgeInsets.all(10),
-                                    child: Container(
-                                        width: double.infinity,
-                                        height: SizeConfig.screenHeight * 0.6,
-                                        decoration: BoxDecoration(
-                                          color: kWhite,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        padding: const EdgeInsets.fromLTRB(
-                                            20, 50, 20, 20),
-                                        child: Form(
-                                            key: _formKey,
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text(
-                                                    "Marquer la présence au poste",
-                                                    style: TextStyle(
-                                                        fontSize: 25.0,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  SizedBox(
-                                                    height: SizeConfig
-                                                            .screenHeight *
-                                                        0.04,
-                                                  ),
-                                                  AppInputField(
-                                                    title: "Date",
-                                                    controller: _dateController,
-                                                    suffixIcon: const Icon(
-                                                        Icons.calendar_today),
-                                                    onTap: () {
-                                                      _selectDate();
-                                                    },
-                                                  ),
-                                                  SizedBox(
-                                                    height: SizeConfig
-                                                            .screenHeight *
-                                                        0.02,
-                                                  ),
-                                                  AppInputField(
-                                                    title: "Appréciation",
-                                                    controller:
-                                                        _messageController,
-                                                    maxLines: 4,
-                                                  ),
-                                                  SizedBox(
-                                                    height: SizeConfig
-                                                            .screenHeight *
-                                                        0.04,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
+                return DataRow(cells: [
+                  DataCell(Text('$index')),
+                  DataCell(Text(nomRepetiteur)),
+                  DataCell(Text(date)),
+                  DataCell(presence['poste'] == null
+                      ? Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: const Text(
+                            "Non",
+                            style: TextStyle(color: kWhite),
+                            textAlign: TextAlign.center,
+                          ))
+                      : Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: const Text(
+                            "Oui",
+                            style: TextStyle(color: kWhite),
+                            textAlign: TextAlign.center,
+                          ))),
+                  DataCell(
+                    presence['poste'] == null
+                        ? TextButton(
+                            onPressed: () async {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                        insetPadding: const EdgeInsets.all(10),
+                                        child: Container(
+                                            width: double.infinity,
+                                            height:
+                                                SizeConfig.screenHeight * 0.6,
+                                            decoration: BoxDecoration(
+                                              color: kWhite,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            padding: const EdgeInsets.fromLTRB(
+                                                20, 50, 20, 20),
+                                            child: Form(
+                                                key: _formKey,
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      AppFilledButton(
-                                                        text: "Fermer",
-                                                        color: Colors.red,
-                                                        onPressed: () {
-                                                          dispose();
-                                                          Navigator.pop(
-                                                              context);
+                                                      const Text(
+                                                        "Marquer la présence au poste",
+                                                        style: TextStyle(
+                                                            fontSize: 25.0,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      SizedBox(
+                                                        height: SizeConfig
+                                                                .screenHeight *
+                                                            0.04,
+                                                      ),
+                                                      AppInputField(
+                                                        title: "Date",
+                                                        controller:
+                                                            _dateController,
+                                                        suffixIcon: const Icon(
+                                                            Icons
+                                                                .calendar_today),
+                                                        onTap: () {
+                                                          _selectDate();
                                                         },
                                                       ),
                                                       SizedBox(
-                                                        width: SizeConfig
-                                                                .screenWidth *
-                                                            0.03,
+                                                        height: SizeConfig
+                                                                .screenHeight *
+                                                            0.02,
                                                       ),
-                                                      Consumer<
-                                                              PresenceAuPosteProvider>(
-                                                          builder: (context,
-                                                              snapshot, child) {
-                                                        WidgetsBinding.instance
-                                                            .addPostFrameCallback(
-                                                                (_) {
-                                                          if (snapshot
-                                                                  .resMessage !=
-                                                              '') {
-                                                            showMessage(
-                                                                message: snapshot
-                                                                    .resMessage,
-                                                                context:
-                                                                    context);
-                                                            snapshot.clear();
-                                                          }
-                                                        });
-                                                        return AppFilledButton(
-                                                          text: "Envoyer",
-                                                          color: Colors.green,
-                                                          onPressed: () async {
-                                                            if (_formKey
-                                                                .currentState!
-                                                                .validate()) {
-                                                              _formKey
-                                                                  .currentState!
-                                                                  .save();
-                                                              final teacherId =
-                                                                  GetStorage().read(
-                                                                      "teacherId");
-
-                                                              snapshot
-                                                                  .postPresenceAuPoste(
-                                                                presencePosteId: id_presence.toString(),
-                                                                poste:
-                                                                    _dateController
-                                                                        .text
-                                                                        .trim(),
-                                                                message:
-                                                                    _messageController
-                                                                        .text
-                                                                        .trim(),
-                                                                context:
-                                                                    context,
-                                                              );
-                                                              showMessage(
-                                                                message:
-                                                                    'Appréciation envoyée ! ',
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .green,
-                                                                context:
-                                                                    context,
-                                                              );
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
+                                                      AppInputField(
+                                                        title: "Appréciation",
+                                                        controller:
+                                                            _messageController,
+                                                        maxLines: 4,
+                                                      ),
+                                                      SizedBox(
+                                                        height: SizeConfig
+                                                                .screenHeight *
+                                                            0.04,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          AppFilledButton(
+                                                            text: "Fermer",
+                                                            color: Colors.red,
+                                                            onPressed: () {
                                                               dispose();
-                                                            } else if (
-                                                                _dateController
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          ),
+                                                          SizedBox(
+                                                            width: SizeConfig
+                                                                    .screenWidth *
+                                                                0.03,
+                                                          ),
+                                                          Consumer<
+                                                                  PresenceAuPosteProvider>(
+                                                              builder: (context,
+                                                                  snapshot,
+                                                                  child) {
+                                                            WidgetsBinding
+                                                                .instance
+                                                                .addPostFrameCallback(
+                                                                    (_) {
+                                                              if (snapshot
+                                                                      .resMessage !=
+                                                                  '') {
+                                                                showMessage(
+                                                                    message:
+                                                                        snapshot
+                                                                            .resMessage,
+                                                                    context:
+                                                                        context);
+                                                                snapshot
+                                                                    .clear();
+                                                              }
+                                                            });
+                                                            return AppFilledButton(
+                                                              text: "Envoyer",
+                                                              color:
+                                                                  Colors.green,
+                                                              onPressed:
+                                                                  () async {
+                                                                if (_formKey
+                                                                    .currentState!
+                                                                    .validate()) {
+                                                                  _formKey
+                                                                      .currentState!
+                                                                      .save();
+                                                                  final teacherId =
+                                                                      GetStorage()
+                                                                          .read(
+                                                                              "teacherId");
+
+                                                                  snapshot
+                                                                      .postPresenceAuPoste(
+                                                                    presencePosteId:
+                                                                        id_presence
+                                                                            .toString(),
+                                                                    poste: _dateController
+                                                                        .text
+                                                                        .trim(),
+                                                                    message: _messageController
+                                                                        .text
+                                                                        .trim(),
+                                                                    context:
+                                                                        context,
+                                                                  );
+                                                                  showMessage(
+                                                                    message:
+                                                                        'Appréciation envoyée ! ',
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .green,
+                                                                    context:
+                                                                        context,
+                                                                  );
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                  dispose();
+                                                                } else if (_dateController
                                                                     .text
                                                                     .isEmpty) {
-                                                              showMessage(
-                                                                message:
-                                                                    'Le champs date est obligatoire',
-                                                                backgroundColor:
-                                                                    Colors.red,
-                                                                context:
-                                                                    context,
-                                                              );
-                                                            }
-                                                          },
-                                                        );
-                                                      }),
+                                                                  showMessage(
+                                                                    message:
+                                                                        'Le champs date est obligatoire',
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .red,
+                                                                    context:
+                                                                        context,
+                                                                  );
+                                                                }
+                                                              },
+                                                            );
+                                                          }),
+                                                        ],
+                                                      )
                                                     ],
-                                                  )
-                                                ],
-                                              ),
-                                            ))));
-                              });
-                        },
-                        child: Text(
-                          "Marquer",
-                          style: TextStyle(
-                            fontSize: SizeConfig.screenHeight * 0.02,
-                            color: kPrimaryColor
-                          ),
-                        ),
-                      )
-                    : const SizedBox(),
-              ),
-            ]);
-          }).toList(),
-        ),
-      ),
-    ]);
+                                                  ),
+                                                ))));
+                                  });
+                            },
+                            child: Text(
+                              "Marquer",
+                              style: TextStyle(
+                                  fontSize: SizeConfig.screenHeight * 0.02,
+                                  color: kPrimaryColor),
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                ]);
+              }).toList(),
+            ),
+          );
   }
 }

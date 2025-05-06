@@ -17,7 +17,6 @@ class AllObservationsBody extends StatefulWidget {
 }
 
 class _AllObservationsBodyState extends State<AllObservationsBody> {
-
   List<dynamic> appreciations = [];
   List<String> repetiteursList = [];
 
@@ -46,10 +45,10 @@ class _AllObservationsBodyState extends State<AllObservationsBody> {
         appreciations = responseData;
 
         repetiteursList = List<String>.from(responseData
-            .map((appreciation) =>
-            appreciation['demande']['repetiteur']['user']['name'].toString())
+            .map((appreciation) => appreciation['demande']['repetiteur']['user']
+                    ['name']
+                .toString())
             .toSet());
-
       });
     } else {
       throw Exception('Failed to load data');
@@ -63,165 +62,226 @@ class _AllObservationsBodyState extends State<AllObservationsBody> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: const [
-              DataColumn(label: Text('No.')),
-              DataColumn(label: Text('Enfant(s)')),
-              DataColumn(label: Text('Date')),
-              DataColumn(label: Text('Appréciation')),
-              DataColumn(label: Text('Réponse Admin')),
-            ],
-            rows: appreciations.asMap().entries.map((entry) {
-              final int index = entry.key + 1;
-              final Map<String, dynamic> appreciation = entry.value;
+    return appreciations.isEmpty
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.info,
+                    size: 50, color: Colors.grey[500]), // Icône informative
+                SizedBox(height: 10),
+                Text(
+                  'Aucune donnée disponible',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          )
+        : SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: const [
+                DataColumn(label: Text('No.')),
+                DataColumn(label: Text('Enfant(s)')),
+                DataColumn(label: Text('Date')),
+                DataColumn(label: Text('Appréciation')),
+                DataColumn(label: Text('Réponse Admin')),
+              ],
+              rows: appreciations.asMap().entries.map((entry) {
+                final int index = entry.key + 1;
+                final Map<String, dynamic> appreciation = entry.value;
 
-              // Accéder aux informations souhaitées
+                // Accéder aux informations souhaitées
 
-              final String dateAppreciation = formatDate(appreciation['created_at']);
-              final String nomEnfant = appreciation['demande']['enfants']['fname'];
-              final String prenomEnfant = appreciation['demande']['enfants']['lname'];
-              final String appreciationSurEnfant = appreciation['appreciation_repetiteur'];
-              final String reponseParents = appreciation['reponse_parents'] ?? '';
+                final String dateAppreciation =
+                    formatDate(appreciation['created_at']);
+                final String nomEnfant =
+                    appreciation['demande']['enfants']['fname'];
+                final String prenomEnfant =
+                    appreciation['demande']['enfants']['lname'];
+                final String appreciationSurEnfant =
+                    appreciation['appreciation_repetiteur'];
+                final String reponseParents =
+                    appreciation['reponse_parents'] ?? '';
 
-              TextEditingController _appreciationSurEnfant = TextEditingController(text: appreciationSurEnfant);
-              TextEditingController _reponseParents = TextEditingController(text: reponseParents);
+                TextEditingController _appreciationSurEnfant =
+                    TextEditingController(text: appreciationSurEnfant);
+                TextEditingController _reponseParents =
+                    TextEditingController(text: reponseParents);
 
-              return DataRow(cells: [
-                DataCell(Text('$index')),
-                DataCell(Text('$nomEnfant $prenomEnfant')),
-                DataCell(Text(dateAppreciation)),
-                DataCell(
-                  IconButton(
-                    onPressed: reponseParents != null ? () async {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                                insetPadding:
-                                const EdgeInsets.all(10),
-                                child: Container(
-                                    width: double.infinity,
-                                    height: SizeConfig
-                                        .screenHeight *
-                                        0.45,
-                                    decoration: BoxDecoration(
-                                      color: kWhite,
-                                      borderRadius:
-                                      BorderRadius.circular(
-                                          12),
-                                    ),
-                                    padding: const EdgeInsets
-                                        .fromLTRB(
-                                        20, 50, 20, 20),
-                                    child: Column(
-                                      children: [
-                                        TextFormField(
-                                          maxLines: 8,
-                                          readOnly: true,
-                                          controller: _appreciationSurEnfant,
-                                          textAlign: TextAlign.justify,
-                                          decoration: const InputDecoration(
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(color: kTextColor),
-                                                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(color: kTextColor),
-                                                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                                            border: InputBorder.none,
-                                          ),
-                                        ),
-                                        SizedBox(height: SizeConfig
-                                            .screenHeight *
-                                            0.03,),
-                                        AppFilledButton(text: 'Fermer', color: Colors.red, onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },)
-                                      ],
-                                    )
-                                ));
-                          });
-                    } : null,
-                    icon: const Icon(Icons.mail_outline, color: kPrimaryColor)
-                    /*Text(
+                return DataRow(cells: [
+                  DataCell(Text('$index')),
+                  DataCell(Text('$nomEnfant $prenomEnfant')),
+                  DataCell(Text(dateAppreciation)),
+                  DataCell(
+                    IconButton(
+                        onPressed: reponseParents != null
+                            ? () async {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                          insetPadding:
+                                              const EdgeInsets.all(10),
+                                          child: Container(
+                                              width: double.infinity,
+                                              height: SizeConfig.screenHeight *
+                                                  0.45,
+                                              decoration: BoxDecoration(
+                                                color: kWhite,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 50, 20, 20),
+                                              child: Column(
+                                                children: [
+                                                  TextFormField(
+                                                    maxLines: 8,
+                                                    readOnly: true,
+                                                    controller:
+                                                        _appreciationSurEnfant,
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      enabledBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  kTextColor),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius.circular(
+                                                                      10.0))),
+                                                      focusedBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  kTextColor),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius.circular(
+                                                                      10.0))),
+                                                      border: InputBorder.none,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: SizeConfig
+                                                            .screenHeight *
+                                                        0.03,
+                                                  ),
+                                                  AppFilledButton(
+                                                    text: 'Fermer',
+                                                    color: Colors.red,
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  )
+                                                ],
+                                              )));
+                                    });
+                              }
+                            : null,
+                        icon:
+                            const Icon(Icons.mail_outline, color: kPrimaryColor)
+                        /*Text(
                       "Lire le message",
                       style: TextStyle(
                           fontSize: SizeConfig.screenHeight * 0.02,
                           color: kPrimaryColor
                       ),
                     ),*/
+                        ),
                   ),
-                ),
-                DataCell(
-                  IconButton(
-                    onPressed:
-                    reponseParents != "null" ? () async {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                                insetPadding:
-                                const EdgeInsets.all(10),
-                                child: Container(
-                                    width: double.infinity,
-                                    height: SizeConfig
-                                        .screenHeight *
-                                        0.45,
-                                    decoration: BoxDecoration(
-                                      color: kWhite,
-                                      borderRadius:
-                                      BorderRadius.circular(
-                                          12),
-                                    ),
-                                    padding: const EdgeInsets
-                                        .fromLTRB(
-                                        10, 50, 10, 20),
-                                    child: Column(
-                                      children: [
-                                        TextFormField(
-                                          maxLines: 8,
-                                          readOnly: true,
-                                          controller: _reponseParents,
-                                          textAlign: TextAlign.justify,
-                                          decoration: const InputDecoration(
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(color: kTextColor),
-                                                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(color: kTextColor),
-                                                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                                            border: InputBorder.none,
-                                          ),
-                                        ),
-                                        SizedBox(height: SizeConfig
-                                            .screenHeight *
-                                            0.03,),
-                                        AppFilledButton(text: 'Fermer', color: Colors.red, onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },)
-                                      ],
-                                    )
-                                ));
-                          });
-                    } : null,
-                    icon: const Icon(Icons.visibility_outlined, color: kPrimaryColor)
-                    /*Text(
+                  DataCell(
+                    IconButton(
+                        onPressed: reponseParents != "null"
+                            ? () async {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                          insetPadding:
+                                              const EdgeInsets.all(10),
+                                          child: Container(
+                                              width: double.infinity,
+                                              height: SizeConfig.screenHeight *
+                                                  0.45,
+                                              decoration: BoxDecoration(
+                                                color: kWhite,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      10, 50, 10, 20),
+                                              child: Column(
+                                                children: [
+                                                  TextFormField(
+                                                    maxLines: 8,
+                                                    readOnly: true,
+                                                    controller: _reponseParents,
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      enabledBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  kTextColor),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius.circular(
+                                                                      10.0))),
+                                                      focusedBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  kTextColor),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius.circular(
+                                                                      10.0))),
+                                                      border: InputBorder.none,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: SizeConfig
+                                                            .screenHeight *
+                                                        0.03,
+                                                  ),
+                                                  AppFilledButton(
+                                                    text: 'Fermer',
+                                                    color: Colors.red,
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  )
+                                                ],
+                                              )));
+                                    });
+                              }
+                            : null,
+                        icon: const Icon(Icons.visibility_outlined,
+                            color: kPrimaryColor)
+                        /*Text(
                       "Lire réponse",
                       style: TextStyle(
                           fontSize: SizeConfig.screenHeight * 0.02,
                           color: kPrimaryColor
                       ),
                     ),*/
+                        ),
                   ),
-                ),
-              ]);
-            }).toList(),
-          ),
-        ),
-      ],
-    );
+                ]);
+              }).toList(),
+            ),
+          );
   }
 }

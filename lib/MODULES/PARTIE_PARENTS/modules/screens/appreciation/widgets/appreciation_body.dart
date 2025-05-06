@@ -53,8 +53,7 @@ class _AppreciationBodyState extends State<AppreciationBody> {
 
   Future<void> fetchData() async {
     final userId = GetStorage().read("userId");
-    final url =
-        "http://api-mon-encadreur.com/api/postes?user_id=$userId";
+    final url = "http://api-mon-encadreur.com/api/postes?user_id=$userId";
 
     final response = await http.get(Uri.parse(url));
 
@@ -106,7 +105,7 @@ class _AppreciationBodyState extends State<AppreciationBody> {
           SizedBox(
             width: SizeConfig.screenWidth * 0.7,
             child: buildDropdown(
-              "Rechercher par répétiteur...",
+              "Rechercher par Encadreur...",
               repetiteursList,
               (selectedRepetiteur) {
                 updateDropdownSelection(selectedRepetiteur, null);
@@ -162,188 +161,215 @@ class _AppreciationBodyState extends State<AppreciationBody> {
 
   Widget buildDataTable() {
     return Expanded(
-      child: ListView(
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const [
-                DataColumn(label: Text('No.')),
-                DataColumn(
-                  label: Text(
-                    "Date",
+      child: appreciations.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.info,
+                      size: 50, color: Colors.grey[500]), // Icône informative
+                  SizedBox(height: 10),
+                  Text(
+                    'Aucune donnée disponible',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            )
+          : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columns: const [
+                  DataColumn(label: Text('No.')),
+                  DataColumn(
+                    label: Text(
+                      "Date",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Nom & Prénom(s)",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                  DataColumn(
+                    label: Text(
+                      "Nom & Prénom(s)",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Matière",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                  DataColumn(
+                    label: Text(
+                      "Matière",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Appréciation sur l'enfant",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                  DataColumn(
+                    label: Text(
+                      "Appréciation sur l'enfant",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Répétiteur",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                  DataColumn(
+                    label: Text(
+                      "Encadreur",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Action",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                  DataColumn(
+                    label: Text(
+                      "Action",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
-              ],
-              rows: appreciations.asMap().entries.where((entry) {
-                final Map<String, dynamic> appreciation = entry.value;
-                final bool hasResponse =
-                    appreciation['reponse_parents'] != null;
+                ],
+                rows: appreciations.asMap().entries.where((entry) {
+                  final Map<String, dynamic> appreciation = entry.value;
+                  final bool hasResponse =
+                      appreciation['reponse_parents'] != null;
 
-                return (showAllMessages ||
-                        (showPendingMessages && !hasResponse) ||
-                        (showAnsweredMessages && hasResponse)) &&
-                    (selectedRepetiteur == null ||
-                        appreciation['repetiteur']['user']['name'] ==
-                            selectedRepetiteur) &&
-                    (selectedEnfant == null ||
-                        '${appreciation['demande']['enfants']['lname']} ${appreciation['demande']['enfants']['fname']}' ==
-                            selectedEnfant);
-              }).map((entry) {
-                final int index = entry.key + 1;
-                final Map<String, dynamic> appreciation = entry.value;
+                  return (showAllMessages ||
+                          (showPendingMessages && !hasResponse) ||
+                          (showAnsweredMessages && hasResponse)) &&
+                      (selectedRepetiteur == null ||
+                          appreciation['repetiteur']['user']['name'] ==
+                              selectedRepetiteur) &&
+                      (selectedEnfant == null ||
+                          '${appreciation['demande']['enfants']['lname']} ${appreciation['demande']['enfants']['fname']}' ==
+                              selectedEnfant);
+                }).map((entry) {
+                  final int index = entry.key + 1;
+                  final Map<String, dynamic> appreciation = entry.value;
 
-                final String dateMessage = formatDate(appreciation['created_at']);
-                final String nomDeLenfant =
-                    appreciation['demande']['enfants']['lname'];
-                final String prenomDeLenfant =
-                    appreciation['demande']['enfants']['fname'];
-                final String matiere =
-                    appreciation['demande']['tarification']['matiere']['name'];
-                final String appreciationRepetiteur =
-                    appreciation['appreciation_repetiteur'];
-                final String nomPrenomRepetiteur =
-                    appreciation['repetiteur']['user']['name'];
-                final String? reponseParents = appreciation['reponse_parents'];
-                final String appreciationId = appreciation['id'];
+                  final String dateMessage =
+                      formatDate(appreciation['created_at']);
+                  final String nomDeLenfant =
+                      appreciation['demande']['enfants']['lname'];
+                  final String prenomDeLenfant =
+                      appreciation['demande']['enfants']['fname'];
+                  final String matiere = appreciation['demande']['tarification']
+                      ['matiere']['name'];
+                  final String appreciationRepetiteur =
+                      appreciation['appreciation_repetiteur'];
+                  final String nomPrenomRepetiteur =
+                      appreciation['repetiteur']['user']['name'];
+                  final String? reponseParents =
+                      appreciation['reponse_parents'];
+                  final String appreciationId = appreciation['id'];
 
-                GetStorage()
-                    .write("appreciationRepetiteur", appreciationRepetiteur);
+                  GetStorage()
+                      .write("appreciationRepetiteur", appreciationRepetiteur);
 
-                return DataRow(cells: [
-                  DataCell(Text('$index')),
-                  DataCell(Text(dateMessage)),
-                  DataCell(Text('$nomDeLenfant $prenomDeLenfant')),
-                  DataCell(Text(matiere)),
-                  DataCell(Text(appreciationRepetiteur, maxLines: 3,)),
-                  DataCell(Text(nomPrenomRepetiteur)),
-                  reponseParents == null
-                      ? DataCell(TextButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return Dialog(
-                                  insetPadding: const EdgeInsets.all(10),
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: SizeConfig.screenHeight * 0.6,
-                                    decoration: BoxDecoration(
-                                      color: kWhite,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    padding: const EdgeInsets.fromLTRB(
-                                        20, 50, 20, 20),
-                                    child: Form(
-                                      key: _formKey,
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              "Observation",
-                                              style: TextStyle(
-                                                fontSize: 25.0,
-                                                fontWeight: FontWeight.bold,
+                  return DataRow(cells: [
+                    DataCell(Text('$index')),
+                    DataCell(Text(dateMessage)),
+                    DataCell(Text('$nomDeLenfant $prenomDeLenfant')),
+                    DataCell(Text(matiere)),
+                    DataCell(Text(
+                      appreciationRepetiteur,
+                      maxLines: 3,
+                    )),
+                    DataCell(Text(nomPrenomRepetiteur)),
+                    reponseParents == null
+                        ? DataCell(TextButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    insetPadding: const EdgeInsets.all(10),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: SizeConfig.screenHeight * 0.6,
+                                      decoration: BoxDecoration(
+                                        color: kWhite,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 50, 20, 20),
+                                      child: Form(
+                                        key: _formKey,
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                "Observation",
+                                                style: TextStyle(
+                                                  fontSize: 25.0,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                            ),
-                                            SizedBox(
-                                              height: SizeConfig.screenHeight *
-                                                  0.04,
-                                            ),
-                                            BaseInputField(
-                                                title:
-                                                    "Appréciation du Répétiteur",
-                                                inputControl: TextFormField(
-                                                  controller:
-                                                      _teacherAnswerController,
-                                                  readOnly: true,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    isDense: true,
-                                                    hintStyle: TextStyle(
-                                                        color: kcLightGreyColor,
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                        fontSize: 14.0),
-                                                    enabledBorder: OutlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                            color:
-                                                                Colors.black54),
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    10.0))),
-                                                    focusedBorder: OutlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                            color:
-                                                                Colors.black54),
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    10.0))),
-                                                    border: InputBorder.none,
-                                                  ),
-                                                  keyboardType:
-                                                      TextInputType.text,
-                                                )),
-                                            /* AppInputField(
+                                              SizedBox(
+                                                height:
+                                                    SizeConfig.screenHeight *
+                                                        0.04,
+                                              ),
+                                              BaseInputField(
+                                                  title:
+                                                      "Appréciation du Répétiteur",
+                                                  inputControl: TextFormField(
+                                                    controller:
+                                                        _teacherAnswerController,
+                                                    readOnly: true,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      isDense: true,
+                                                      hintStyle: TextStyle(
+                                                          color:
+                                                              kcLightGreyColor,
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 14.0),
+                                                      enabledBorder: OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  color: Colors
+                                                                      .black54),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius.circular(
+                                                                      10.0))),
+                                                      focusedBorder: OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  color: Colors
+                                                                      .black54),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius.circular(
+                                                                      10.0))),
+                                                      border: InputBorder.none,
+                                                    ),
+                                                    keyboardType:
+                                                        TextInputType.text,
+                                                  )),
+                                              /* AppInputField(
                                               title:
                                                   "Appréciation du Répétiteur",
                                               keyboardType:
@@ -351,91 +377,92 @@ class _AppreciationBodyState extends State<AppreciationBody> {
                                               controller:
                                                   _teacherAnswerController,
                                             ), */
-                                            SizedBox(
-                                              height: SizeConfig.screenHeight *
-                                                  0.02,
-                                            ),
-                                            AppInputField(
-                                              title: "Votre Réponse",
-                                              keyboardType: TextInputType.text,
-                                              maxLines: 3,
-                                              controller:
-                                                  _parentAnswerController,
-                                            ),
-                                            SizedBox(
-                                              height: SizeConfig.screenHeight *
-                                                  0.04,
-                                            ),
-                                            Consumer<ParentAnswerProvider>(
-                                                builder: (context, sendAnswer,
-                                                    child) {
-                                              return AppFilledButton(
-                                                text: "Envoyer",
-                                                color: Colors.green,
-                                                onPressed: () async {
-                                                  if (_formKey.currentState!
-                                                      .validate()) {
-                                                    _formKey.currentState!
-                                                        .save();
+                                              SizedBox(
+                                                height:
+                                                    SizeConfig.screenHeight *
+                                                        0.02,
+                                              ),
+                                              AppInputField(
+                                                title: "Votre Réponse",
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                maxLines: 3,
+                                                controller:
+                                                    _parentAnswerController,
+                                              ),
+                                              SizedBox(
+                                                height:
+                                                    SizeConfig.screenHeight *
+                                                        0.04,
+                                              ),
+                                              Consumer<ParentAnswerProvider>(
+                                                  builder: (context, sendAnswer,
+                                                      child) {
+                                                return AppFilledButton(
+                                                  text: "Envoyer",
+                                                  color: Colors.green,
+                                                  onPressed: () async {
+                                                    if (_formKey.currentState!
+                                                        .validate()) {
+                                                      _formKey.currentState!
+                                                          .save();
 
-                                                    sendAnswer.sendAnswer(
-                                                        appreciationId:
-                                                            appreciationId,
-                                                        reponseParents:
-                                                            _parentAnswerController
-                                                                .text
-                                                                .trim(),
-                                                        context: context);
-                                                    dispose();
-                                                    showMessage(
-                                                      message:
-                                                          'Méssage envoyé ! ',
-                                                      backgroundColor:
-                                                          Colors.green,
-                                                      context: context,
-                                                    );
-                                                    Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                const OperationSuccessScreen()));
-                                                  } else if (_parentAnswerController
-                                                      .text.isEmpty) {
-                                                    showMessage(
-                                                      message:
-                                                          'Le champ appreciation est obligatoire',
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      context: context,
-                                                    );
-                                                  }
-                                                },
-                                              );
-                                            })
-                                          ],
+                                                      sendAnswer.sendAnswer(
+                                                          appreciationId:
+                                                              appreciationId,
+                                                          reponseParents:
+                                                              _parentAnswerController
+                                                                  .text
+                                                                  .trim(),
+                                                          context: context);
+                                                      dispose();
+                                                      showMessage(
+                                                        message:
+                                                            'Méssage envoyé ! ',
+                                                        backgroundColor:
+                                                            Colors.green,
+                                                        context: context,
+                                                      );
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const OperationSuccessScreen()));
+                                                    } else if (_parentAnswerController
+                                                        .text.isEmpty) {
+                                                      showMessage(
+                                                        message:
+                                                            'Le champ appreciation est obligatoire',
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        context: context,
+                                                      );
+                                                    }
+                                                  },
+                                                );
+                                              })
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          child: const Text(
-                            "Répondre",
-                            style: TextStyle(color: kPrimaryColor),
-                          ),
-                        ))
-                      : const DataCell(Text(
-                          "Déjà répondu",
-                          style: TextStyle(color: Colors.grey),
-                        )),
-                ]);
-              }).toList(),
+                                  );
+                                },
+                              );
+                            },
+                            child: const Text(
+                              "Répondre",
+                              style: TextStyle(color: kPrimaryColor),
+                            ),
+                          ))
+                        : const DataCell(Text(
+                            "Déjà répondu",
+                            style: TextStyle(color: Colors.grey),
+                          )),
+                  ]);
+                }).toList(),
+              ),
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -461,7 +488,10 @@ class _AppreciationBodyState extends State<AppreciationBody> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: kWhite),
         backgroundColor: kPrimaryColor,
-        title: const Text("Boîte de réception", style: TextStyle(color: kWhite),),
+        title: const Text(
+          "Boîte de réception",
+          style: TextStyle(color: kWhite),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
@@ -474,16 +504,17 @@ class _AppreciationBodyState extends State<AppreciationBody> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    buildFilterButton("Tous",
-                        const Color.fromARGB(255, 17, 135, 232), () {
+                    buildFilterButton(
+                        "Tous", const Color.fromARGB(255, 17, 135, 232), () {
                       updateFilterState(true, false, false);
                     }),
-                    buildFilterButton("En attente",
-                        const Color.fromARGB(255, 22, 190, 56), () {
+                    buildFilterButton(
+                        "En attente", const Color.fromARGB(255, 22, 190, 56),
+                        () {
                       updateFilterState(false, true, false);
                     }),
-                    buildFilterButton("Répondus",
-                        const Color.fromARGB(255, 227, 172, 5), () {
+                    buildFilterButton(
+                        "Répondus", const Color.fromARGB(255, 227, 172, 5), () {
                       updateFilterState(false, false, true);
                     }),
                   ],

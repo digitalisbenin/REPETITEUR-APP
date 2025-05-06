@@ -110,8 +110,26 @@ class _TeacherDashboardScreenBodyState
               height: SizeConfig.screenHeight * 0.02,
             ),
             Expanded(
-              child: ListView(children: [
-                SingleChildScrollView(
+              child: demandes.isEmpty
+      ? Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.info, size: 50, color: Colors.grey[500]), // Icône informative
+              SizedBox(height: 10),
+              Text(
+                'Aucune donnée disponible',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        )
+      :  SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     headingRowHeight: SizeConfig.screenHeight *
@@ -338,11 +356,13 @@ class _TeacherDashboardScreenBodyState
                     }).toList(),
                   ),
                 ),
-              ]),
-            ),
+            )
           ],
-        ),
-      ),
-    );
+            ),
+          
+        )
+        );
+      
+    
   }
 }

@@ -57,63 +57,91 @@ class _AdminResponseBodyState extends State<AdminResponseBody> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: kWhite),
         backgroundColor: kPrimaryColor,
-        title: const Text("Réponse de l'administrateur", style: TextStyle(color: kWhite),),
+        title: const Text(
+          "Réponse de l'administrateur",
+          style: TextStyle(color: kWhite),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                  columns: const [
-                   // DataColumn(label: Text('No.')),
-                    DataColumn(
-                        label: Text(
-                      "Date",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      "Message",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      "Réponse",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87),
-                    )),
-                  ],
-                  rows: messages.asMap().entries.map((entry) {
-                    final int index = entry.key + 1;
-                    final Map<String, dynamic> messagesList = entry.value;
+          padding: const EdgeInsets.all(8.0),
+          child: messages.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.info,
+                          size: 50,
+                          color: Colors.grey[500]), // Icône informative
+                      SizedBox(height: 10),
+                      Text(
+                        'Aucune donnée disponible',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                      columns: const [
+                        // DataColumn(label: Text('No.')),
+                        DataColumn(
+                            label: Text(
+                          "Date",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          "Message",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          "Réponse",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87),
+                        )),
+                      ],
+                      rows: messages.asMap().entries.map((entry) {
+                        final int index = entry.key + 1;
+                        final Map<String, dynamic> messagesList = entry.value;
 
-                    final String messageDate = messagesList['created_at'] ?? '';
-                    final String userMessage = messagesList['message'] ?? '';
-                    final String adminResponse = messagesList['reponse_admin'] ?? '';
+                        final String messageDate =
+                            messagesList['created_at'] ?? '';
+                        final String userMessage =
+                            messagesList['message'] ?? '';
+                        final String adminResponse =
+                            messagesList['reponse_admin'] ?? '';
 
-                    return DataRow(cells: [
-                    //  DataCell(Text('$index')),
-                      DataCell(Text(formatDate(messageDate))),
-                      DataCell(Text(userMessage, maxLines: 10,)),
-                      DataCell(Text(adminResponse, maxLines: 10,)),
-                    ]);
-                  }).toList()),
-            )
-          ],
-        ),
-      ),
+                        return DataRow(cells: [
+                          //  DataCell(Text('$index')),
+                          DataCell(Text(formatDate(messageDate))),
+                          DataCell(Text(
+                            userMessage,
+                            maxLines: 10,
+                          )),
+                          DataCell(Text(
+                            adminResponse,
+                            maxLines: 10,
+                          )),
+                        ]);
+                      }).toList()),
+                )),
     );
   }
 }

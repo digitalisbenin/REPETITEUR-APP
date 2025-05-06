@@ -50,8 +50,7 @@ class _DemandListScreenBodyState extends State<DemandListScreenBody> {
 
   Future<String> getParentId() async {
     // L'URL de votre API
-    var url =
-        Uri.parse('http://api-mon-encadreur.com/api/parents');
+    var url = Uri.parse('http://api-mon-encadreur.com/api/parents');
 
     // Récupérez le token de l'utilisateur connecté
     String token = GetStorage().read("token");
@@ -81,8 +80,7 @@ class _DemandListScreenBodyState extends State<DemandListScreenBody> {
   Future<void> fetchData() async {
     final userId = GetStorage().read("userId");
 
-    final url =
-        "http://api-mon-encadreur.com/api/demandes?user_id=$userId";
+    final url = "http://api-mon-encadreur.com/api/demandes?user_id=$userId";
 
     final response = await http.get(Uri.parse(url));
 
@@ -100,13 +98,12 @@ class _DemandListScreenBodyState extends State<DemandListScreenBody> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                /*Expanded(
+        child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(children: [
+              Row(
+                children: [
+                  /*Expanded(
                   child: AddChildButton(
                     text: 'Ajouter un enfant',
                     iconData: CupertinoIcons.add,
@@ -119,267 +116,282 @@ class _DemandListScreenBodyState extends State<DemandListScreenBody> {
                 SizedBox(
                   width: SizeConfig.screenWidth * 0.04,
                 ),*/
-                Expanded(
-                  child: DemandFormButton(
-                    text: 'Nouvelle demande',
-                    press: () {
-                      Navigator.pushNamed(context, AddTeacherScreen.routeName);
-                    },
-                    color: kWhite,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: SizeConfig.screenHeight * 0.035,
-            ),
-            Expanded(
-              child: ListView(
-                children: [
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text('No.')),
-                        DataColumn(label: Text('Nom')),
-                        DataColumn(label: Text('Prénom(s)')),
-                        DataColumn(label: Text('Classe')),
-                        DataColumn(label: Text('Matière')),
-                        DataColumn(label: Text('Répétiteur')),
-                        DataColumn(label: Text('Statut')),
-                        DataColumn(label: Text('Motif')),
-                        DataColumn(label: Text('Appréciation')),
-                      ],
-                      rows: demandes.asMap().entries.map((entry) {
-                        final int index = entry.key + 1;
-                        final Map<String, dynamic> demande = entry.value;
-
-                        // Accéder aux informations souhaitées
-
-                        final String nomEnfant = demande['enfants']['lname'];
-                        final String prenomEnfant = demande['enfants']['fname'];
-                        final String classe =
-                            demande['tarification']['classe']['name'];
-                        final String matiere =
-                            demande['tarification']['matiere']['name'];
-                        final String repetiteur =
-                            demande['repetiteur']['user']['name'];
-                        final String status = demande['status'];
-                        final String motif = demande['motif'] ?? '';
-
-                        return DataRow(cells: [
-                          DataCell(Text('$index')),
-                          DataCell(Text(nomEnfant)),
-                          DataCell(Text(prenomEnfant)),
-                          DataCell(Text(classe)),
-                          DataCell(Text(matiere)),
-                          DataCell(Text(repetiteur)),
-                          DataCell(
-                            Text(
-                              status,
-                              style: TextStyle(
-                                color: () {
-                                  if (status == 'Validé') {
-                                    return Colors.green;
-                                  } else if (status == 'En cours') {
-                                    return Colors.orange;
-                                  } else {
-                                    return Colors.red;
-                                  }
-                                }(),
-                              ),
-                            ),
-                          ),
-                          DataCell(Text(motif)),
-                          DataCell(
-                            TextButton(
-                              onPressed: status == 'Validé'
-                                  ? () async {
-                                      String demandeId = demande['id'];
-                                      var parentId = await getParentId();
-
-                                      // Afficher l'ID dans la console
-                                      print(
-                                          'ID de la demande cliquée : $demandeId');
-
-                                      print('ID du parent : $parentId');
-
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return Dialog(
-                                                insetPadding:
-                                                    const EdgeInsets.all(10),
-                                                child: Container(
-                                                    width: double.infinity,
-                                                    height: SizeConfig
-                                                            .screenHeight *
-                                                        0.6,
-                                                    decoration: BoxDecoration(
-                                                      color: kWhite,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(
-                                                        20, 50, 20, 20),
-                                                    child: Form(
-                                                        key: _formKey,
-                                                        child:
-                                                            SingleChildScrollView(
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const Text(
-                                                                "Appréciation",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        25.0,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                              SizedBox(
-                                                                height: SizeConfig
-                                                                        .screenHeight *
-                                                                    0.04,
-                                                              ),
-                                                              AppInputField(
-                                                                title: "Objet",
-                                                                keyboardType:
-                                                                    TextInputType
-                                                                        .text,
-                                                                controller:
-                                                                    _objetController,
-                                                              ),
-                                                              SizedBox(
-                                                                height: SizeConfig
-                                                                        .screenHeight *
-                                                                    0.02,
-                                                              ),
-                                                              AppInputField(
-                                                                title:
-                                                                    "Votre appréciation",
-                                                                keyboardType:
-                                                                    TextInputType
-                                                                        .text,
-                                                                controller:
-                                                                    _appreciationController,
-                                                                maxLines: 3,
-                                                              ),
-                                                              SizedBox(
-                                                                height: SizeConfig
-                                                                        .screenHeight *
-                                                                    0.04,
-                                                              ),
-                                                              Consumer<
-                                                                      ParentPostAppreciationProvider>(
-                                                                  builder: (context,
-                                                                      postAppreciation,
-                                                                      child) {
-                                                                WidgetsBinding
-                                                                    .instance
-                                                                    .addPostFrameCallback(
-                                                                        (_) {
-                                                                  if (postAppreciation
-                                                                          .resMessage !=
-                                                                      '') {
-                                                                    showMessage(
-                                                                        message:
-                                                                            postAppreciation
-                                                                                .resMessage,
-                                                                        context:
-                                                                            context);
-                                                                    postAppreciation
-                                                                        .clear();
-                                                                  }
-                                                                });
-                                                                return AppFilledButton(
-                                                                  text:
-                                                                      "Envoyer",
-                                                                  color: Colors
-                                                                      .green,
-                                                                  onPressed:
-                                                                      () async {
-                                                                    if (_formKey
-                                                                        .currentState!
-                                                                        .validate()) {
-                                                                      _formKey
-                                                                          .currentState!
-                                                                          .save();
-
-                                                                      postAppreciation
-                                                                          .sendAppreciation(
-                                                                        demandeId:
-                                                                            demandeId,
-                                                                        parentId:
-                                                                            parentId,
-                                                                        objet: _objetController
-                                                                            .text
-                                                                            .trim(),
-                                                                        appreciation_parents: _appreciationController
-                                                                            .text
-                                                                            .trim(),
-                                                                        context:
-                                                                            context,
-                                                                      );
-                                                                      dispose();
-                                                                      showMessage(
-                                                                        message:
-                                                                            'Opération réussie ! ',
-                                                                        backgroundColor:
-                                                                            Colors.green,
-                                                                        context:
-                                                                            context,
-                                                                      );
-                                                                      Navigator.of(
-                                                                              context)
-                                                                          .pop();
-                                                                    } else if (_appreciationController
-                                                                        .text
-                                                                        .isEmpty) {
-                                                                      showMessage(
-                                                                        message:
-                                                                            'Le champ appreciation est obligatoire',
-                                                                        backgroundColor:
-                                                                            Colors.red,
-                                                                        context:
-                                                                            context,
-                                                                      );
-                                                                    }
-                                                                  },
-                                                                );
-                                                              })
-                                                            ],
-                                                          ),
-                                                        ))));
-                                          });
-                                    }
-                                  : null,
-                              child: Text(
-                                "Appréciation",
-                                style: TextStyle(
-                                  fontSize: SizeConfig.screenHeight * 0.02,
-                                  color: status == 'Validé'
-                                      ? kPrimaryColor
-                                      : kcLightGreyColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ]);
-                      }).toList(),
+                  Expanded(
+                    child: DemandFormButton(
+                      text: 'Nouvelle demande',
+                      press: () {
+                        Navigator.pushNamed(
+                            context, AddTeacherScreen.routeName);
+                      },
+                      color: kWhite,
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+              SizedBox(
+                height: SizeConfig.screenHeight * 0.035,
+              ),
+              Expanded(
+                child: demandes.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.info,
+                                size: 50,
+                                color: Colors.grey[500]), // Icône informative
+                            SizedBox(height: 10),
+                            Text(
+                              'Aucune donnée disponible',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          columns: const [
+                            DataColumn(label: Text('No.')),
+                            DataColumn(label: Text('Nom')),
+                            DataColumn(label: Text('Prénom(s)')),
+                            DataColumn(label: Text('Classe')),
+                            DataColumn(label: Text('Matière')),
+                            DataColumn(label: Text('Encadreur')),
+                            DataColumn(label: Text('Statut')),
+                            DataColumn(label: Text('Motif')),
+                            DataColumn(label: Text('Appréciation')),
+                          ],
+                          rows: demandes.asMap().entries.map((entry) {
+                            final int index = entry.key + 1;
+                            final Map<String, dynamic> demande = entry.value;
+
+                            // Accéder aux informations souhaitées
+
+                            final String nomEnfant =
+                                demande['enfants']['lname'];
+                            final String prenomEnfant =
+                                demande['enfants']['fname'];
+                            final String classe =
+                                demande['tarification']['classe']['name'];
+                            final String matiere =
+                                demande['tarification']['matiere']['name'];
+                            final String repetiteur =
+                                demande['repetiteur']['user']['name'];
+                            final String status = demande['status'];
+                            final String motif = demande['motif'] ?? '';
+
+                            return DataRow(cells: [
+                              DataCell(Text('$index')),
+                              DataCell(Text(nomEnfant)),
+                              DataCell(Text(prenomEnfant)),
+                              DataCell(Text(classe)),
+                              DataCell(Text(matiere)),
+                              DataCell(Text(repetiteur)),
+                              DataCell(
+                                Text(
+                                  status,
+                                  style: TextStyle(
+                                    color: () {
+                                      if (status == 'Validé') {
+                                        return Colors.green;
+                                      } else if (status == 'En cours') {
+                                        return Colors.orange;
+                                      } else {
+                                        return Colors.red;
+                                      }
+                                    }(),
+                                  ),
+                                ),
+                              ),
+                              DataCell(Text(motif)),
+                              DataCell(
+                                TextButton(
+                                  onPressed: status == 'Validé'
+                                      ? () async {
+                                          String demandeId = demande['id'];
+                                          var parentId = await getParentId();
+
+                                          // Afficher l'ID dans la console
+                                          print(
+                                              'ID de la demande cliquée : $demandeId');
+
+                                          print('ID du parent : $parentId');
+
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return Dialog(
+                                                    insetPadding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: Container(
+                                                        width: double.infinity,
+                                                        height: SizeConfig
+                                                                .screenHeight *
+                                                            0.6,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: kWhite,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .fromLTRB(
+                                                                20, 50, 20, 20),
+                                                        child: Form(
+                                                            key: _formKey,
+                                                            child:
+                                                                SingleChildScrollView(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  const Text(
+                                                                    "Appréciation",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            25.0,
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: SizeConfig
+                                                                            .screenHeight *
+                                                                        0.04,
+                                                                  ),
+                                                                  AppInputField(
+                                                                    title:
+                                                                        "Objet",
+                                                                    keyboardType:
+                                                                        TextInputType
+                                                                            .text,
+                                                                    controller:
+                                                                        _objetController,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: SizeConfig
+                                                                            .screenHeight *
+                                                                        0.02,
+                                                                  ),
+                                                                  AppInputField(
+                                                                    title:
+                                                                        "Votre appréciation",
+                                                                    keyboardType:
+                                                                        TextInputType
+                                                                            .text,
+                                                                    controller:
+                                                                        _appreciationController,
+                                                                    maxLines: 3,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: SizeConfig
+                                                                            .screenHeight *
+                                                                        0.04,
+                                                                  ),
+                                                                  Consumer<
+                                                                          ParentPostAppreciationProvider>(
+                                                                      builder: (context,
+                                                                          postAppreciation,
+                                                                          child) {
+                                                                    WidgetsBinding
+                                                                        .instance
+                                                                        .addPostFrameCallback(
+                                                                            (_) {
+                                                                      if (postAppreciation
+                                                                              .resMessage !=
+                                                                          '') {
+                                                                        showMessage(
+                                                                            message:
+                                                                                postAppreciation.resMessage,
+                                                                            context: context);
+                                                                        postAppreciation
+                                                                            .clear();
+                                                                      }
+                                                                    });
+                                                                    return AppFilledButton(
+                                                                      text:
+                                                                          "Envoyer",
+                                                                      color: Colors
+                                                                          .green,
+                                                                      onPressed:
+                                                                          () async {
+                                                                        if (_formKey
+                                                                            .currentState!
+                                                                            .validate()) {
+                                                                          _formKey
+                                                                              .currentState!
+                                                                              .save();
+
+                                                                          postAppreciation
+                                                                              .sendAppreciation(
+                                                                            demandeId:
+                                                                                demandeId,
+                                                                            parentId:
+                                                                                parentId,
+                                                                            objet:
+                                                                                _objetController.text.trim(),
+                                                                            appreciation_parents:
+                                                                                _appreciationController.text.trim(),
+                                                                            context:
+                                                                                context,
+                                                                          );
+                                                                          dispose();
+                                                                          showMessage(
+                                                                            message:
+                                                                                'Opération réussie ! ',
+                                                                            backgroundColor:
+                                                                                Colors.green,
+                                                                            context:
+                                                                                context,
+                                                                          );
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                        } else if (_appreciationController
+                                                                            .text
+                                                                            .isEmpty) {
+                                                                          showMessage(
+                                                                            message:
+                                                                                'Le champ appreciation est obligatoire',
+                                                                            backgroundColor:
+                                                                                Colors.red,
+                                                                            context:
+                                                                                context,
+                                                                          );
+                                                                        }
+                                                                      },
+                                                                    );
+                                                                  })
+                                                                ],
+                                                              ),
+                                                            ))));
+                                              });
+                                        }
+                                      : null,
+                                  child: Text(
+                                    "Appréciation",
+                                    style: TextStyle(
+                                      fontSize: SizeConfig.screenHeight * 0.02,
+                                      color: status == 'Validé'
+                                          ? kPrimaryColor
+                                          : kcLightGreyColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]);
+                          }).toList(),
+                        ),
+                      ),
+              )
+            ])));
   }
 }

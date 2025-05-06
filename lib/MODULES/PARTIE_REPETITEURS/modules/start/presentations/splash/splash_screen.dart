@@ -19,11 +19,13 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool isFirst = false;
-
+String? teacherRoleId;
+  String? parentRoleId;
   @override
   void initState() {
     super.initState();
     checkFirstRun();
+     fetchRoles();
   }
 
   Future<void> checkFirstRun() async {
@@ -40,20 +42,45 @@ class _SplashScreenState extends State<SplashScreen> {
       });
     }
   }
+   Future<void> fetchRoles() async {
+    final teacherId = await fetchRepetiteurRoleId();
+    final parentId = await fetchParentsRoleId();
+
+    setState(() {
+      teacherRoleId = teacherId;
+      parentRoleId = parentId;
+    });
+  }
+  
 
   @override
   Widget build(BuildContext context) {
-    final teacherRoleId = fetchRepetiteurRoleId();
-    final parentRoleId = fetchParentsRoleId();
+    // final teacherRoleId = fetchRepetiteurRoleId();
+    // final parentRoleId = fetchParentsRoleId();
     final roleCheck = GetStorage().read('role_id');
+    final token = GetStorage().read('token');
+  
+print("Token récupéré : $token");
+print("role id encadreur récupéré : $teacherRoleId");
+print("Role id parents récupéré : $parentRoleId");
+print("role récupéré : $roleCheck");
+ print("🔹 Comparaison : roleCheck ($roleCheck) == parentRoleId ($parentRoleId)");
+
     SizeConfig().init(context);
     return Scaffold(
       body: SplashScreenBody(
-          nextScreen: isFirst
-              ? const OnBoardingScreen()
-              : roleCheck == parentRoleId
-                  ? const ParentHomeScreen()
-                  : const TeacherHomeScreen()),
+      nextScreen: token == null || token.isEmpty
+          ? const OnBoardingScreen() // Redirige vers l'OnBoarding si pas de token
+          : roleCheck == parentRoleId
+              ? const TeacherHomeScreen()
+              : const ParentHomeScreen(),
+    ),
+      // body: SplashScreenBody(
+      //     nextScreen: isFirst
+      //         ? const OnBoardingScreen()
+      //         : roleCheck == parentRoleId
+      //             ? const ParentHomeScreen()
+      //             : const TeacherHomeScreen()),
     );
   }
 }

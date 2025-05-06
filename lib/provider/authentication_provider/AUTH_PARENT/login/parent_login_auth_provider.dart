@@ -49,6 +49,29 @@ class ParentLoginProvider extends ChangeNotifier {
           userData.write('userId', _userId);
           userData.write('token', _token);
           debugPrint('id : $_userId');
+
+          var condictionsUrl = Uri.https(requestBaseUrl, '/api/condictions', {
+            'user_id': _userId.toString(), // Convertir en String
+          });
+
+          final condictionsResponse = await client.get(
+            condictionsUrl,
+            headers: {'Authorization': 'Bearer $_token'},
+          );
+
+          if (condictionsResponse.statusCode == 200) {
+            debugPrint('Condictions: ${condictionsResponse.body}');
+            final responseDatas = jsonDecode(condictionsResponse.body);
+            debugPrint("response data : $responseDatas");
+            debugPrint("response body : ${response.body}");
+            if (responseDatas != null) {
+            
+              userData.write('condition', responseDatas['id']);
+            }
+          } else {
+            debugPrint(
+                'Erreur lors de la récupération des condictions: ${condictionsResponse.statusCode}');
+          }
         }
       }
     } catch (e) {
@@ -101,6 +124,8 @@ class ParentLoginProvider extends ChangeNotifier {
           String userId = GetStorage().read("userId");
 
           var sendToParentTableUrl = Uri.https(requestBaseUrl, '/api/parents');
+          var sendToConditionsTableUrl =
+              Uri.https(requestBaseUrl, '/api/condictions');
 
           var response = await client.get(sendToParentTableUrl, headers: {
             'Authorization': 'Bearer ${GetStorage().read("token")}',
@@ -121,6 +146,13 @@ class ParentLoginProvider extends ChangeNotifier {
             final parentBody = jsonEncode({"user_id": userId});
             debugPrint("reponse du parent body : $parentBody");
             await client.post(sendToParentTableUrl, body: parentBody, headers: {
+              'Authorization': 'Bearer ${GetStorage().read("token")}',
+              'Content-Type': 'application/json'
+            });
+
+            // Deuxième requête avec une URL différente
+            await client
+                .post(sendToConditionsTableUrl, body: parentBody, headers: {
               'Authorization': 'Bearer ${GetStorage().read("token")}',
               'Content-Type': 'application/json'
             });

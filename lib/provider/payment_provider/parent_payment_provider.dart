@@ -17,7 +17,7 @@ class ParentPaymentProvider extends ChangeNotifier {
 
   Future<String?> getUserIdByName(String name) async {
     final usersUrl = Uri.parse(
-        'http://apirepetiteur.wadounnou.com/api/users?name=$name');
+        'https://www.api-mon-encadreur.com/api/users?name=$name');
 
     var client = http.Client();
 
@@ -63,7 +63,7 @@ class ParentPaymentProvider extends ChangeNotifier {
 
     if (adminUserId != null) {
       final notificationUrl = Uri.parse(
-          'http://apirepetiteur.wadounnou.com/api/notifications');
+          'https://www.api-mon-encadreur.com/api/notifications');
 
       var client = http.Client();
 
@@ -107,7 +107,7 @@ class ParentPaymentProvider extends ChangeNotifier {
     BuildContext? context,
   }) async {
     var putPayementUrl = Uri.parse(
-        "http://apirepetiteur.wadounnou.com/api/payements/$paymentId");
+        "https://www.api-mon-encadreur.com/api/payements/$paymentId");
 
     String token = GetStorage().read("token");
 

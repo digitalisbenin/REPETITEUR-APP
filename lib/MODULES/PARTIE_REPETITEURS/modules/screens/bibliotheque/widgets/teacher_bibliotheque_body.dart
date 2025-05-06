@@ -9,11 +9,12 @@ class TeacherBibliothequeBody extends StatefulWidget {
   const TeacherBibliothequeBody({super.key});
 
   @override
-  State<TeacherBibliothequeBody> createState() => _TeacherBibliothequeBodyState();
+  State<TeacherBibliothequeBody> createState() =>
+      _TeacherBibliothequeBodyState();
 }
 
 class _TeacherBibliothequeBodyState extends State<TeacherBibliothequeBody> {
- List<dynamic> epreuves = [];
+  List<dynamic> epreuves = [];
 
   @override
   void initState() {
@@ -22,8 +23,7 @@ class _TeacherBibliothequeBodyState extends State<TeacherBibliothequeBody> {
   }
 
   Future<void> fetchEpreuvesData() async {
-    const epreuvesUrl =
-        'http://api-mon-encadreur.com/api/epreuves';
+    const epreuvesUrl = 'http://api-mon-encadreur.com/api/epreuves';
 
     final response = await http.get(Uri.parse(epreuvesUrl));
 
@@ -44,87 +44,106 @@ class _TeacherBibliothequeBodyState extends State<TeacherBibliothequeBody> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: kWhite),
         backgroundColor: kPrimaryColor,
-        title: const Text("Bibliothèque", style: TextStyle(color: kWhite),),
+        title: const Text(
+          "Bibliothèque",
+          style: TextStyle(color: kWhite),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('No.')),
-                    DataColumn(
-                        label: Text(
-                      "Classe",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      "Matière",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      "Epreuve(s)",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      "Corrigé",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87),
-                    ))
-                  ],
-                  rows: epreuves.asMap().entries.map((entry) {
-                    final int index = entry.key + 1;
-                    final Map<String, dynamic> epreuve = entry.value;
+          padding: const EdgeInsets.all(8.0),
+          child: epreuves.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.info,
+                          size: 50,
+                          color: Colors.grey[500]), // Icône informative
+                      SizedBox(height: 10),
+                      Text(
+                        'Aucune donnée disponible',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                      columns: const [
+                        DataColumn(label: Text('No.')),
+                        DataColumn(
+                            label: Text(
+                          "Classe",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          "Matière",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          "Epreuve(s)",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          "Corrigé",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87),
+                        ))
+                      ],
+                      rows: epreuves.asMap().entries.map((entry) {
+                        final int index = entry.key + 1;
+                        final Map<String, dynamic> epreuve = entry.value;
 
-                    final String classe = epreuve['classe']['name'];
-                    final String matiere = epreuve['matiere']['name'];
-                    final String epreuveUrl = epreuve['epreuve'];
-                    final String corrigeUrl = epreuve['corrige'] ?? 'N/A';
+                        final String classe = epreuve['classe']['name'];
+                        final String matiere = epreuve['matiere']['name'];
+                        final String epreuveUrl = epreuve['epreuve'];
+                        final String corrigeUrl = epreuve['corrige'] ?? 'N/A';
 
-                    return DataRow(cells: [
-                      DataCell(Text('$index')),
-                      DataCell(Text(classe)),
-                      DataCell(Text(matiere)),
-                      DataCell(TextButton(
-                          onPressed: () async {
-                            await launchUrl(Uri.parse(epreuveUrl),
-                                mode: LaunchMode.inAppBrowserView);
-                          },
-                          child: const Text(
-                            "Télécharger",
-                            style: TextStyle(color: kPrimaryColor),
-                          ))),
-                      DataCell(TextButton(
-                          onPressed: () async {
-                            await launchUrl(Uri.parse(corrigeUrl),
-                                mode: LaunchMode.inAppBrowserView);
-                          },
-                          child: const Text("Télécharger",
-                              style: TextStyle(color: kPrimaryColor))))
-                    ]);
-                  }).toList()),
-            )
-          ],
-        ),
-      ),
+                        return DataRow(cells: [
+                          DataCell(Text('$index')),
+                          DataCell(Text(classe)),
+                          DataCell(Text(matiere)),
+                          DataCell(TextButton(
+                              onPressed: () async {
+                                await launchUrl(Uri.parse(epreuveUrl),
+                                    mode: LaunchMode.inAppBrowserView);
+                              },
+                              child: const Text(
+                                "Télécharger",
+                                style: TextStyle(color: kPrimaryColor),
+                              ))),
+                          DataCell(TextButton(
+                              onPressed: () async {
+                                await launchUrl(Uri.parse(corrigeUrl),
+                                    mode: LaunchMode.inAppBrowserView);
+                              },
+                              child: const Text("Télécharger",
+                                  style: TextStyle(color: kPrimaryColor))))
+                        ]);
+                      }).toList()),
+                )),
     );
   }
 }

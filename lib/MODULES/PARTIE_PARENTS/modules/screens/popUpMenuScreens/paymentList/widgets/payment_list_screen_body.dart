@@ -37,8 +37,7 @@ class _PaymentListScreenBodyState extends State<PaymentListScreenBody> {
 
   Future<void> fetchData() async {
     final userId = GetStorage().read("userId");
-    final url =
-        "http://api-mon-encadreur.com/api/payements?user_id=$userId";
+    final url = "http://api-mon-encadreur.com/api/payements?user_id=$userId";
 
     final response = await http.get(Uri.parse(url));
 
@@ -88,15 +87,15 @@ class _PaymentListScreenBodyState extends State<PaymentListScreenBody> {
               transactionId: transactionId.toString(),
               postOrderCallback: () {
                 /* postPayement(transactionId.toString()); */
-                Provider.of<ParentPaymentProvider>(context, listen: false).makePayment(
+                Provider.of<ParentPaymentProvider>(context, listen: false)
+                    .makePayment(
                   paymentId: paiementId,
                   reference: transactionId.toString(),
                   status: "Payer",
                   context: context,
-
                 );
               },
-               paiementId: selectedPaiementId,
+              paiementId: selectedPaiementId,
             ),
           ),
         );
@@ -144,134 +143,148 @@ class _PaymentListScreenBodyState extends State<PaymentListScreenBody> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10.0),
-      child: ListView(
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const [
-                DataColumn(label: Text('No.')),
-                DataColumn(
-                    label: Text(
-                  "Echéance",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Nom & Prénom(s)",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Montant",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Status",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Actions",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87),
-                ))
-              ],
-              rows: paiementList.asMap().entries.map((entry) {
-                final int index = entry.key + 1;
-                final Map<String, dynamic> paiement = entry.value;
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10.0),
+        child: paiementList.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.info,
+                        size: 50, color: Colors.grey[500]), // Icône informative
+                    SizedBox(height: 10),
+                    Text(
+                      'Aucune donnée disponible',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              )
+            : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text('No.')),
+                    DataColumn(
+                        label: Text(
+                      "Echéance",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      "Nom & Prénom(s)",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      "Montant",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      "Status",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      "Actions",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87),
+                    ))
+                  ],
+                  rows: paiementList.asMap().entries.map((entry) {
+                    final int index = entry.key + 1;
+                    final Map<String, dynamic> paiement = entry.value;
 
-                final String echeance = paiement['date'];
-                final String nomEnfant =
-                    paiement['demande']['enfants']['lname'];
-                final String prenomEnfant =
-                    paiement['demande']['enfants']['fname'];
-                final String montant =
-                    paiement['demande']['tarification']['prix'];
-                final String status = paiement['status'];
+                    final String echeance = paiement['date'];
+                    final String nomEnfant =
+                        paiement['demande']['enfants']['lname'];
+                    final String prenomEnfant =
+                        paiement['demande']['enfants']['fname'];
+                    final String montant =
+                        paiement['demande']['tarification']['prix'];
+                    final String status = paiement['status'];
 
-                final String paiementId = paiement['id'];
+                    final String paiementId = paiement['id'];
 
-                final String parentName =
-                    paiement['demande']['enfants']['parents']['user']['name'];
-                final String parentEmail =
-                    paiement['demande']['enfants']['parents']['user']['email'];
-                final String parentPhone =
-                    paiement['demande']['enfants']['phone'];
+                    final String parentName = paiement['demande']['enfants']
+                        ['parents']['user']['name'];
+                    final String parentEmail = paiement['demande']['enfants']
+                        ['parents']['user']['email'];
+                    final String parentPhone =
+                        paiement['demande']['enfants']['phone'];
 
-                GetStorage().write("parentName", parentName);
-                GetStorage().write("parentEmail", parentEmail);
-                GetStorage().write("parentPhone", parentPhone);
-                GetStorage().write("paiementId", paiementId);
+                    GetStorage().write("parentName", parentName);
+                    GetStorage().write("parentEmail", parentEmail);
+                    GetStorage().write("parentPhone", parentPhone);
+                    GetStorage().write("paiementId", paiementId);
 
-                return DataRow(cells: [
-                  DataCell(Text('$index')),
-                  DataCell(Text(echeance)),
-                  DataCell(Text('$nomEnfant $prenomEnfant')),
-                  DataCell(Text(montant)),
-                  DataCell(Text(status, style: TextStyle(
-                    color: () {
-                      if (status == 'Impayer') {
-                        return Colors.red;
-                      } else {
-                        return Colors.green;
-                      }
-                    }(),
-                  ))),
-                  status == 'Impayer'
-                      ? DataCell(TextButton(
-                          onPressed: () async {
-                            print(paiementId);
+                    return DataRow(cells: [
+                      DataCell(Text('$index')),
+                      DataCell(Text(echeance)),
+                      DataCell(Text('$nomEnfant $prenomEnfant')),
+                      DataCell(Text(montant)),
+                      DataCell(Text(status, style: TextStyle(
+                        color: () {
+                          if (status == 'Impayer') {
+                            return Colors.red;
+                          } else {
+                            return Colors.green;
+                          }
+                        }(),
+                      ))),
+                      status == 'Impayer'
+                          ? DataCell(TextButton(
+                              onPressed: () async {
+                                print(paiementId);
 
-                            setState(() {
-                              selectedPaiementId = paiementId;
-                              
-                            });
+                                setState(() {
+                                  selectedPaiementId = paiementId;
+                                });
 
-                            print(selectedPaiementId);
+                                print(selectedPaiementId);
 
-                            final success =
-                                await openKkiapayPayment(montant, paiementId);
-                            if (success) {
-                              showMessage(
-                                  message: 'Paiement réussi !',
-                                  backgroundColor: Colors.green,
-                                  context: context);
-                            } else {
-                              showMessage(
-                                  message: 'Échec du paiement',
-                                  backgroundColor: Colors.red,
-                                  context: context);
-                            }
-                          },
-                          child: const Text("Payer",
-                              style: TextStyle(color: kPrimaryColor))))
-                      : const DataCell(Text(
-                          "Déjà payé",
-                          style: TextStyle(color: Colors.grey),
-                        )),
-                ]);
-              }).toList(),
-            ),
-          )
-        ],
-      ),
-    );
+                                final success = await openKkiapayPayment(
+                                    montant, paiementId);
+                                if (success) {
+                                  showMessage(
+                                      message: 'Paiement réussi !',
+                                      backgroundColor: Colors.green,
+                                      context: context);
+                                } else {
+                                  showMessage(
+                                      message: 'Échec du paiement',
+                                      backgroundColor: Colors.red,
+                                      context: context);
+                                }
+                              },
+                              child: const Text("Payer",
+                                  style: TextStyle(color: kPrimaryColor))))
+                          : const DataCell(Text(
+                              "Déjà payé",
+                              style: TextStyle(color: Colors.grey),
+                            )),
+                    ]);
+                  }).toList(),
+                ),
+              ));
   }
 }
